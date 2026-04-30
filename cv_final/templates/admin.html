@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — CréaCV</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f0f0f; --paper:#faf9f7; --gold:#c9943a; --gold-light:#f0d98f;
+    --muted:#6b6560; --border:#e2ded8; --sidebar:#0f0f0f;
+    --success:#16a34a; --danger:#dc2626; --warning:#d97706;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:#f0efed;color:var(--ink);display:flex;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:220px;background:var(--sidebar);color:white;
+    padding:0;display:flex;flex-direction:column;flex-shrink:0;
+    position:sticky;top:0;height:100vh;
+  }
+  .sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid #222;}
+  .sidebar-logo h1{font-family:'DM Serif Display',serif;font-size:1.4rem;color:white;}
+  .sidebar-logo p{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:3px;}
+  .sidebar-nav{padding:20px 0;flex:1;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 24px;font-size:13px;color:#888;
+    text-decoration:none;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;
+  }
+  .nav-item:hover,.nav-item.active{color:white;background:rgba(255,255,255,0.07);}
+  .nav-item.active{border-left:2px solid var(--gold);color:var(--gold-light);}
+  .sidebar-footer{padding:20px 24px;border-top:1px solid #222;}
+  .sidebar-footer a{font-size:12px;color:#555;text-decoration:none;display:block;}
+  .sidebar-footer a:hover{color:#888;}
+
+  /* MAIN */
+  .main{flex:1;padding:40px;overflow-x:hidden;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;}
+  .page-title{font-family:'DM Serif Display',serif;font-size:2rem;}
+  .page-subtitle{color:var(--muted);font-size:14px;margin-top:4px;}
+
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+  .stat-card{
+    background:white;border-radius:12px;padding:20px 22px;
+    border:1.5px solid var(--border);
+  }
+  .stat-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .stat-value{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--ink);}
+  .stat-value.gold{color:var(--gold);}
+  .stat-value.green{color:var(--success);}
+  .stat-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+
+  /* FILTERS */
+  .filters{
+    background:white;border-radius:12px;padding:16px 20px;
+    border:1.5px solid var(--border);margin-bottom:20px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .filters input[type="text"]{
+    flex:1;min-width:200px;padding:9px 14px;
+    border:1.5px solid var(--border);border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:14px;outline:none;
+    transition:border-color 0.2s;
+  }
+  .filters input:focus{border-color:var(--gold);}
+  .filter-btns{display:flex;gap:6px;}
+  .filter-btn{
+    padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);
+    font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;
+    text-decoration:none;color:var(--muted);transition:all 0.15s;background:white;
+  }
+  .filter-btn:hover,.filter-btn.active{border-color:var(--gold);color:var(--ink);background:#fffbf5;}
+  .search-btn{
+    padding:9px 20px;background:var(--ink);color:white;border:none;
+    border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;
+    cursor:pointer;transition:background 0.15s;
+  }
+  .search-btn:hover{background:#333;}
+
+  /* TABLE */
+  .table-card{background:white;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;}
+  .table-header{
+    display:grid;grid-template-columns:1fr 1fr 120px 90px 90px 160px;
+    padding:12px 20px;background:#fafafa;border-bottom:1.5px solid var(--border);
+    font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;
+  }
+  .client-row{
+    display:grid;grid-template-columns:1fr 1fr 120px 90px 90px 160px;
+    padding:16px 20px;border-bottom:1px solid #f0efed;align-items:center;
+    transition:background 0.15s;
+  }
+  .client-row:last-child{border-bottom:none;}
+  .client-row:hover{background:#fafafa;}
+  .client-name{font-weight:600;font-size:14px;}
+  .client-email{font-size:12px;color:var(--muted);margin-top:2px;}
+  .client-poste{font-size:13px;color:var(--muted);}
+  .client-date{font-size:11px;color:var(--muted);}
+  .tpl-badge{
+    display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;
+    padding:3px 8px;border-radius:100px;font-weight:600;
+  }
+  .tpl-simple{background:#f1f5f9;color:#64748b;}
+  .tpl-professionnel{background:#eff6ff;color:#1d4ed8;}
+  .tpl-premium{background:#fefce8;color:#854d0e;}
+  .paid-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;
+  }
+  .paid-badge.paid{background:#dcfce7;color:var(--success);}
+  .paid-badge.unpaid{background:#fef2f2;color:var(--danger);}
+
+  /* ACTIONS */
+  .actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .btn-action{
+    padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;
+    cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.15s;
+    text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  }
+  .btn-validate{background:#dcfce7;color:var(--success);}
+  .btn-validate:hover{background:#bbf7d0;}
+  .btn-unvalidate{background:#fef2f2;color:var(--danger);}
+  .btn-unvalidate:hover{background:#fecaca;}
+  .btn-preview{background:#f1f5f9;color:#475569;}
+  .btn-preview:hover{background:#e2e8f0;}
+  .btn-delete{background:#fef2f2;color:var(--danger);}
+  .btn-delete:hover{background:#fecaca;}
+
+  /* MODAL */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+    z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:white;border-radius:16px;padding:32px;width:480px;max-width:90vw;
+    animation:slideup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes slideup{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal h3{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:8px;}
+  .modal p{color:var(--muted);font-size:14px;margin-bottom:20px;}
+  .modal textarea{
+    width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;min-height:80px;outline:none;
+  }
+  .modal textarea:focus{border-color:var(--gold);}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;}
+  .btn-modal-save{
+    background:var(--ink);color:white;border:none;padding:10px 20px;border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;
+  }
+  .btn-modal-close{
+    background:white;color:var(--muted);border:1.5px solid var(--border);
+    padding:10px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;
+    font-size:13px;cursor:pointer;
+  }
+
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--ink);color:white;
+    padding:12px 20px;border-radius:10px;font-size:13px;z-index:300;
+    transform:translateY(100px);opacity:0;transition:all 0.3s;
+    display:flex;align-items:center;gap:8px;
+  }
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{background:#16a34a;}
+  .toast.error{background:#dc2626;}
+
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+  .empty-state .icon{font-size:48px;margin-bottom:16px;}
+
+  @media(max-width:900px){
+    .sidebar{display:none;}
+    .stats-grid{grid-template-columns:1fr 1fr;}
+    .table-header,.client-row{grid-template-columns:1fr 1fr 80px 160px;}
+    .col-template,.col-date{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <h1>CréaCV</h1>
+    <p>Administration</p>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" href="/admin">📋 Clients</a>
+    <a class="nav-item" href="/" target="_blank">🌐 Voir le site</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="/admin/logout">→ Déconnexion</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tableau de bord</h1>
+      <p class="page-subtitle">Gérez vos clients et validez les paiements</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total CV</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub">depuis le début</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Payés</div>
+      <div class="stat-value green" id="stat-paid">—</div>
+      <div class="stat-sub">paiements validés</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">En attente</div>
+      <div class="stat-value gold" id="stat-unpaid">—</div>
+      <div class="stat-sub">à convertir</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Aujourd'hui</div>
+      <div class="stat-value" id="stat-today">—</div>
+      <div class="stat-sub">nouvelles demandes</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <form method="GET" action="/admin">
+    <div class="filters">
+      <input type="text" name="search" placeholder="Rechercher par nom, email, poste..." value="{{ search }}">
+      <div class="filter-btns">
+        <a href="/admin?paid=all" class="filter-btn {% if filter_paid=='all' %}active{% endif %}">Tous</a>
+        <a href="/admin?paid=paid" class="filter-btn {% if filter_paid=='paid' %}active{% endif %}">✓ Payés</a>
+        <a href="/admin?paid=unpaid" class="filter-btn {% if filter_paid=='unpaid' %}active{% endif %}">⏳ En attente</a>
+      </div>
+      <button type="submit" class="search-btn">Rechercher</button>
+    </div>
+  </form>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-header">
+      <span>Client</span>
+      <span>Poste</span>
+      <span class="col-template">Template</span>
+      <span>Statut</span>
+      <span class="col-date">Date</span>
+      <span>Actions</span>
+    </div>
+
+    {% if clients %}
+      {% for c in clients %}
+      <div class="client-row" id="row-{{ c.id }}">
+        <div>
+          <div class="client-name">{{ c.nom }}</div>
+          <div class="client-email">{{ c.email }}</div>
+        </div>
+        <div class="client-poste">{{ c.poste }}</div>
+        <div class="col-template">
+          <span class="tpl-badge tpl-{{ c.template }}">{{ c.template }}</span>
+        </div>
+        <div>
+          {% if c.paid %}
+          <span class="paid-badge paid">✓ Payé</span>
+          {% else %}
+          <span class="paid-badge unpaid">⏳ En attente</span>
+          {% endif %}
+        </div>
+        <div class="client-date col-date">{{ c.created_at[:10] if c.created_at else '—' }}</div>
+        <div class="actions">
+          <a href="/preview/{{ c.id }}" target="_blank" class="btn-action btn-preview">👁</a>
+          {% if c.paid %}
+          <button class="btn-action btn-unvalidate" onclick="unvalidatePayment('{{ c.id }}')">✗ Annuler</button>
+          {% else %}
+          <button class="btn-action btn-validate" onclick="validatePayment('{{ c.id }}')">✓ Valider</button>
+          {% endif %}
+          <button class="btn-action btn-delete" onclick="deleteClient('{{ c.id }}', '{{ c.nom }}')">🗑</button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">📋</div>
+        <p>Aucun client trouvé{% if search %} pour "{{ search }}"{% endif %}.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Load stats
+fetch('/admin/stats').then(r => r.json()).then(d => {
+  document.getElementById('stat-total').textContent = d.total;
+  document.getElementById('stat-paid').textContent = d.paid;
+  document.getElementById('stat-unpaid').textContent = d.unpaid;
+  document.getElementById('stat-today').textContent = d.today;
+});
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function validatePayment(id) {
+  fetch('/admin/validate/' + id, {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if(d.success) {
+        const row = document.getElementById('row-' + id);
+        row.querySelector('.paid-badge').className = 'paid-badge paid';
+        row.querySelector('.paid-badge').textContent = '✓ Payé';
+        const actionsDiv = row.querySelector('.actions');
+        actionsDiv.querySelector('.btn-validate').outerHTML =
+          `<button class="btn-action btn-unvalidate" onclick="unvalidatePayment('${id}')">✗ Annuler</button>`;
+        showToast('✓ Paiement validé — PDF débloqué !', 'success');
+        // Refresh stats
+        fetch('/admin/stats').then(r => r.json()).then(d => {
+          document.getElementById('stat-paid').textContent = d.paid;
+          document.getElementById('stat-unpaid').textContent = d.unpaid;
+        });
+      }
+    });
+}
+
+function unvalidatePayment(id) {
+  if(!confirm('Annuler la validation du paiement ?')) return;
+  fetch('/admin/unvalidate/' + id, {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if(d.success) {
+        const row = document.getElementById('row-' + id);
+        row.querySelector('.paid-badge').className = 'paid-badge unpaid';
+        row.querySelector('.paid-badge').textContent = '⏳ En attente';
+        const btn = row.querySelector('.btn-unvalidate');
+        btn.outerHTML = `<button class="btn-action btn-validate" onclick="validatePayment('${id}')">✓ Valider</button>`;
+        showToast('Paiement annulé.', 'error');
+      }
+    });
+}
+
+function deleteClient(id, nom) {
+  if(!confirm(`Supprimer définitivement le CV de "${nom}" ?\n\nCette action est irréversible.`)) return;
+  fetch('/admin/delete/' + id, {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if(d.success) {
+        document.getElementById('row-' + id).remove();
+        showToast('Client supprimé.', 'error');
+      }
+    });
+}
+</script>
+
+</body>
+</html>
