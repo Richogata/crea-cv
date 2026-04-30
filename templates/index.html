@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CréaCV — Votre CV Professionnel en Minutes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #faf9f7;
+    --gold: #c9943a;
+    --gold-light: #f0d98f;
+    --muted: #6b6560;
+    --border: #e2ded8;
+    --error: #c0392b;
+    --success: #27ae60;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(201,148,58,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 20%, rgba(201,148,58,0.08) 0%, transparent 50%);
+  }
+  .hero-badge {
+    display: inline-block;
+    border: 1px solid rgba(201,148,58,0.5);
+    color: var(--gold-light);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .hero p {
+    font-size: 1.1rem;
+    color: rgba(250,249,247,0.7);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    font-weight: 300;
+    line-height: 1.7;
+    position: relative;
+  }
+  .hero-scroll {
+    display: inline-block;
+    color: var(--gold-light);
+    font-size: 13px;
+    letter-spacing: 1px;
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .hero-scroll::after {
+    content: '↓';
+    display: block;
+    margin-top: 8px;
+    font-size: 20px;
+    animation: bounce 1.5s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* TEMPLATES SECTION */
+  .templates-bar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .templates-bar span {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-right: 8px;
+  }
+  .tpl-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 2px solid var(--border);
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: white;
+    color: var(--muted);
+  }
+  .tpl-pill:hover { border-color: var(--gold); color: var(--ink); }
+  .tpl-pill.active { border-color: var(--gold); background: var(--gold); color: white; }
+  .tpl-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-simple { background: #94a3b8; }
+  .dot-pro { background: #1e3a5f; }
+  .dot-premium { background: var(--gold); }
+
+  /* FORM CONTAINER */
+  .form-section { padding: 60px 40px; max-width: 860px; margin: 0 auto; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 40px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  label .req { color: var(--gold); }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    background: white;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,148,58,0.12);
+  }
+  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+  /* PHOTO UPLOAD */
+  .photo-upload {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+  }
+  .photo-upload:hover { border-color: var(--gold); background: rgba(201,148,58,0.03); }
+  .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .photo-upload-icon { font-size: 32px; margin-bottom: 10px; }
+  .photo-upload p { font-size: 14px; color: var(--muted); }
+  .photo-upload strong { color: var(--gold); }
+  #photo-preview {
+    display: none;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 12px auto 0;
+    border: 3px solid var(--gold);
+  }
+
+  /* DIVIDER */
+  .form-divider {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 8px 0;
+  }
+  .form-divider span {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .form-divider::before, .form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .template-cards {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .template-card {
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    background: white;
+  }
+  .template-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+  .template-card.selected { border-color: var(--gold); background: rgba(201,148,58,0.04); }
+  /* Pro card — look spécial */
+  #card-professionnel {
+    border-color: #1e3a5f;
+    background: linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%);
+  }
+  #card-professionnel:hover, #card-professionnel.selected {
+    border-color: #1e3a5f;
+    box-shadow: 0 8px 30px rgba(30,58,95,0.15);
+  }
+  /* Premium card — look prestige */
+  #card-premium {
+    border-color: var(--gold);
+    background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
+    color: #f0d98f;
+  }
+  #card-premium .template-name { color: #f0d98f; }
+  #card-premium .template-desc { color: rgba(240,217,143,0.7); }
+  #card-premium:hover, #card-premium.selected {
+    border-color: #f0d98f;
+    box-shadow: 0 8px 40px rgba(201,148,58,0.3);
+    transform: translateY(-4px);
+  }
+  #card-premium .check { border-color: rgba(240,217,143,0.4); }
+  #card-premium.selected .check { background: var(--gold); border-color: var(--gold); }
+  .template-card input[type="radio"] {
+    position: absolute; opacity: 0; pointer-events: none;
+  }
+  .template-card .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    position: absolute; top: 14px; right: 14px;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .template-card.selected .check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+    font-size: 11px;
+  }
+  .template-card.selected .check::after { content: '✓'; }
+  .template-preview { height: 100px; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  /* Simple preview */
+  .preview-simple { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); display: flex; flex-direction: column; gap: 4px; padding: 12px; }
+  /* Pro preview */
+  .preview-pro { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%); display: flex; gap: 0; }
+  /* Premium preview */
+  .preview-premium { background: linear-gradient(135deg, #0f1218 0%, #1c2030 100%); position: relative; overflow: hidden; }
+  .preview-premium-glow {
+    position: absolute; top: -20px; left: 20px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,144,58,0.4) 0%, transparent 70%);
+  }
+  .preview-line { height: 6px; border-radius: 3px; background: rgba(0,0,0,0.12); }
+  .preview-line.short { width: 50%; }
+  .preview-line.medium { width: 75%; }
+  .preview-line.white { background: rgba(255,255,255,0.25); }
+  .preview-sidebar { width: 35%; background: rgba(0,0,0,0.35); padding: 10px 8px; display: flex; flex-direction: column; gap: 5px; }
+  .preview-main { flex: 1; padding: 10px 8px; display: flex; flex-direction: column; gap: 5px; }
+  .preview-gold { background: linear-gradient(90deg, #c9943a 0%, #f0d98f 100%); height: 3px; border-radius: 2px; width: 100%; }
+  .preview-dark-line { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.18); }
+  .preview-sidebar-dark { width: 38%; background: rgba(0,0,0,0.6); padding: 10px 7px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .preview-hex { width: 20px; height: 20px; clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); background: rgba(200,144,58,0.5); margin-bottom: 3px; }
+  .preview-main-premium { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 5px; }
+  .template-name {
+    font-weight: 700; font-size: 15px; margin-bottom: 4px;
+  }
+  .template-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .template-badge {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+    margin-top: 8px; font-weight: 700;
+  }
+  .badge-free { background: #e8f5e9; color: #2e7d32; }
+  .badge-pro { background: #e3f2fd; color: #1565c0; }
+  .badge-premium { background: rgba(201,148,58,0.2); color: #f0d98f; border: 1px solid rgba(201,148,58,0.3); }
+
+  /* SUBMIT */
+  .submit-area {
+    grid-column: 1 / -1;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .btn-submit {
+    background: var(--gold);
+    color: white;
+    border: none;
+    padding: 18px 60px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit:hover { background: #b8832a; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,148,58,0.35); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit.loading { pointer-events: none; opacity: 0.8; }
+  .btn-submit .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  .btn-submit.loading .spinner { display: inline-block; }
+  .btn-submit.loading .btn-text::after { content: '...'; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .submit-note { font-size: 13px; color: var(--muted); text-align: center; }
+
+  /* FLASH */
+  .flash-msg {
+    margin-bottom: 24px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    border: 1.5px solid;
+  }
+  .flash-msg.error { background: #fef2f2; border-color: #fca5a5; color: var(--error); }
+  .flash-msg.success { background: #f0fdf4; border-color: #86efac; color: var(--success); }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: rgba(250,249,247,0.5);
+    text-align: center;
+    padding: 30px;
+    font-size: 13px;
+    margin-top: 60px;
+  }
+  footer strong { color: var(--gold-light); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 50px 20px 40px; }
+    .form-section { padding: 40px 20px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .template-cards { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-badge">✦ Création de CV Professionnelle</div>
+  <h1>Votre CV,<br><em>élevé au rang d'art</em></h1>
+  <p>Remplissez le formulaire ci-dessous et obtenez un CV élégant et professionnel en quelques secondes.</p>
+  <a href="#formulaire" class="hero-scroll">Commencer maintenant</a>
+</section>
+
+<div class="templates-bar">
+  <span>Templates :</span>
+  <div class="tpl-pill active"><span class="dot dot-simple"></span> Simple</div>
+  <div class="tpl-pill"><span class="dot dot-pro"></span> Professionnel</div>
+  <div class="tpl-pill"><span class="dot dot-premium"></span> Premium</div>
+</div>
+
+<section class="form-section" id="formulaire">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash-msg {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <h2 class="section-title">Vos informations</h2>
+  <p class="section-subtitle">Tous les champs marqués d'un <span style="color:var(--gold)">✦</span> sont obligatoires.</p>
+
+  <form method="POST" enctype="multipart/form-data" id="cv-form">
+    <div class="form-grid">
+
+      <!-- Photo -->
+      <div class="form-group full">
+        <label>Photo de profil (optionnel)</label>
+        <div class="photo-upload" id="photo-drop">
+          <input type="file" name="photo" accept="image/*" id="photo-input" onchange="previewPhoto(this)">
+          <div class="photo-upload-icon">📷</div>
+          <p>Glissez votre photo ici ou <strong>cliquez pour choisir</strong></p>
+          <p style="font-size:12px;margin-top:4px;">JPG, PNG, WEBP — max 5MB</p>
+          <img id="photo-preview" src="" alt="Preview">
+        </div>
+      </div>
+
+      <!-- Infos perso -->
+      <div class="form-divider full"><span>✦ Informations personnelles</span></div>
+
+      <div class="form-group">
+        <label>Nom complet <span class="req">✦</span></label>
+        <input type="text" name="nom" placeholder="Jean Dupont" required value="{{ request.form.get('nom', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Poste recherché <span class="req">✦</span></label>
+        <input type="text" name="poste" placeholder="Développeur Web Senior" required value="{{ request.form.get('poste', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Email <span class="req">✦</span></label>
+        <input type="email" name="email" placeholder="jean@exemple.com" required value="{{ request.form.get('email', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Téléphone</label>
+        <input type="tel" name="telephone" placeholder="+33 6 00 00 00 00" value="{{ request.form.get('telephone', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Ville</label>
+        <input type="text" name="ville" placeholder="Paris" value="{{ request.form.get('ville', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Pays</label>
+        <input type="text" name="pays" placeholder="France" value="{{ request.form.get('pays', '') }}">
+      </div>
+
+      <!-- Objectif -->
+      <div class="form-divider full"><span>✦ Profil & Objectif</span></div>
+      <div class="form-group full">
+        <label>Objectif professionnel (optionnel)</label>
+        <textarea name="objectif" placeholder="Ex : Développeur passionné avec 5 ans d'expérience, je cherche à rejoindre une équipe innovante...">{{ request.form.get('objectif', '') }}</textarea>
+      </div>
+
+      <!-- Expérience -->
+      <div class="form-divider full"><span>✦ Parcours</span></div>
+      <div class="form-group full">
+        <label>Expériences professionnelles <span class="req">✦</span></label>
+        <textarea name="experience" style="min-height:130px" placeholder="- Développeur Full Stack chez Acme Corp (2020-2024) — Développement d'une plateforme SaaS
+- Chef de projet IT chez StartupXYZ (2018-2020) — Gestion d'une équipe de 5 développeurs
+...">{{ request.form.get('experience', '') }}</textarea>
+        <span style="font-size:11px;color:var(--muted)">Un élément par ligne. Commencez par - ou directement.</span>
+      </div>
+      <div class="form-group full">
+        <label>Formation <span class="req">✦</span></label>
+        <textarea name="formation" placeholder="- Master Informatique — Université Paris-Saclay (2018)
+- BTS SIO option SLAM (2016)
+...">{{ request.form.get('formation', '') }}</textarea>
+      </div>
+
+      <!-- Compétences -->
+      <div class="form-divider full"><span>✦ Compétences & Langues</span></div>
+      <div class="form-group">
+        <label>Compétences</label>
+        <textarea name="competences" placeholder="- Python, Flask, Django
+- React, Vue.js
+- Docker, AWS
+- SQL, MongoDB">{{ request.form.get('competences', '') }}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Langues</label>
+        <textarea name="langues" placeholder="- Français (natif)
+- Anglais (courant)
+- Espagnol (notions)">{{ request.form.get('langues', '') }}</textarea>
+      </div>
+
+      <!-- Template -->
+      <div class="form-divider full"><span>✦ Choisissez votre template</span></div>
+      <div class="template-cards">
+
+        <label class="template-card selected" id="card-simple">
+          <input type="radio" name="template" value="simple" checked>
+          <div class="check"></div>
+          <div class="template-preview preview-simple">
+            <div class="preview-line medium"></div>
+            <div class="preview-line short"></div>
+            <div style="flex:1"></div>
+            <div class="preview-line medium"></div>
+            <div class="preview-line short"></div>
+            <div class="preview-line medium"></div>
+          </div>
+          <div class="template-name">Simple</div>
+          <div class="template-desc">Propre et lisible · fond blanc · police classique · idéal pour les débutants</div>
+          <span class="template-badge badge-free">Classique</span>
+        </label>
+
+        <label class="template-card" id="card-professionnel">
+          <input type="radio" name="template" value="professionnel">
+          <div class="check"></div>
+          <div class="template-preview preview-pro">
+            <div class="preview-sidebar">
+              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.25);margin:0 auto 5px;"></div>
+              <div class="preview-line white short"></div>
+              <div class="preview-line white medium"></div>
+              <div class="preview-line white short"></div>
+            </div>
+            <div class="preview-main">
+              <div class="preview-line white medium"></div>
+              <div class="preview-line white short"></div>
+              <div style="height:1px;background:rgba(255,255,255,0.15);margin:4px 0;"></div>
+              <div class="preview-line white medium"></div>
+              <div class="preview-line white short"></div>
+            </div>
+          </div>
+          <div class="template-name">Professionnel</div>
+          <div class="template-desc">Sidebar colorée · photo ronde · barres de compétences · design moderne</div>
+          <span class="template-badge badge-pro">⭐ Recommandé</span>
+        </label>
+
+        <label class="template-card" id="card-premium">
+          <input type="radio" name="template" value="premium">
+          <div class="check"></div>
+          <div class="template-preview preview-premium">
+            <div class="preview-premium-glow"></div>
+            <div style="display:flex;height:100%;position:relative;z-index:1;">
+              <div class="preview-sidebar-dark">
+                <div class="preview-hex"></div>
+                <div class="preview-dark-line" style="width:90%;"></div>
+                <div class="preview-dark-line" style="width:65%;"></div>
+                <div class="preview-dark-line" style="width:80%;"></div>
+              </div>
+              <div class="preview-main-premium">
+                <div class="preview-gold"></div>
+                <div class="preview-dark-line" style="background:rgba(30,32,48,0.7);width:80%;"></div>
+                <div class="preview-dark-line" style="background:rgba(30,32,48,0.5);width:60%;"></div>
+                <div class="preview-dark-line" style="background:rgba(30,32,48,0.5);width:75%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="template-name">Premium</div>
+          <div class="template-desc">Sidebar sombre · dégradé doré · photo hexagonale · look prestige</div>
+          <span class="template-badge badge-premium">✦ Prestige</span>
+        </label>
+
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-area">
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <span class="spinner"></span>
+          <span class="btn-text">Générer mon CV</span>
+        </button>
+        <p class="submit-note">🔒 Vos données sont sécurisées · Preview gratuite · PDF après paiement</p>
+      </div>
+
+    </div>
+  </form>
+</section>
+
+<footer>
+  <strong>CréaCV</strong> — Votre CV professionnel en quelques minutes.<br>
+  <span style="font-size:11px;">Pour toute question, contactez-nous sur WhatsApp.</span>
+</footer>
+
+<script>
+  // Template selection
+  document.querySelectorAll('.template-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // Photo preview
+  function previewPhoto(input) {
+    const preview = document.getElementById('photo-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        document.querySelector('.photo-upload-icon').textContent = '✅';
+        document.querySelector('.photo-upload p').textContent = input.files[0].name;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Form submit spinner
+  document.getElementById('cv-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    btn.classList.add('loading');
+    btn.querySelector('.btn-text').textContent = 'Génération en cours';
+  });
+</script>
+</body>
+</html>

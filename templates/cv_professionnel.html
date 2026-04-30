@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV — {{ cv.nom }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #1b6b6b;
+    --teal-dark: #124848;
+    --teal-mid: #2a8c8c;
+    --teal-light: #e0f0f0;
+    --teal-pale: #f0f8f8;
+    --accent: #e08030;
+    --text: #1a2e2e;
+    --body: #3a4a4a;
+    --muted: #7a9494;
+    --rule: #c8e0e0;
+    --white: #ffffff;
+  }
+  @page { size: A4; margin: 0; }
+  html, body {
+    background: #c0cdcd;
+    font-family: 'Nunito', sans-serif;
+    font-size: 9pt;
+    line-height: 1.55;
+    color: var(--body);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 20px auto;
+    box-shadow: 0 6px 52px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HEADER — couleur unie teal ── */
+  .cv-top {
+    background: var(--teal-dark);
+    padding: 0 0 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .cv-top::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .cv-top::after {
+    content: '';
+    position: absolute;
+    right: 40px; bottom: 0;
+    width: 120px; height: 120px;
+    border-radius: 50% 50% 0 0;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .cv-top-inner {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    padding: 14mm 18mm 0 18mm;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* PHOTO RONDE */
+  .cv-photo {
+    width: 80px; height: 80px;
+    border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--accent);
+    flex-shrink: 0;
+    margin-bottom: -1px;
+  }
+  .cv-photo-ph {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+    margin-bottom: -1px;
+  }
+
+  .cv-top-text { flex: 1; padding-bottom: 12px; }
+  .cv-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 25pt;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--white);
+    margin-bottom: 5px;
+    letter-spacing: -0.3px;
+  }
+  .cv-poste {
+    font-size: 8pt;
+    font-weight: 300;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ACCENT LINE */
+  .cv-accent-strip {
+    height: 3px;
+    background: var(--accent);
+    margin-top: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* CONTACT BAR */
+  .cv-contacts {
+    background: var(--teal);
+    padding: 8px 18mm;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+  }
+  .cv-contact-item {
+    font-size: 7.5pt;
+    color: rgba(255,255,255,0.8);
+    display: flex; align-items: center; gap: 5px;
+    font-weight: 400;
+  }
+
+  /* ── LAYOUT SIDEBAR + MAIN ── */
+  .cv-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 190px 1fr;
+  }
+
+  /* SIDEBAR */
+  .cv-sidebar {
+    background: var(--teal-pale);
+    border-right: 1px solid var(--rule);
+    padding: 16px 14px 16px 18mm;
+  }
+
+  /* MAIN */
+  .cv-main {
+    padding: 16px 18mm 16px 16px;
+  }
+
+  /* SECTIONS */
+  .cv-section { margin-bottom: 18px; break-inside: avoid; }
+
+  .cv-section-title {
+    font-size: 6.5pt;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    padding-bottom: 5px;
+    border-bottom: 1.5px solid var(--teal-mid);
+    margin-bottom: 11px;
+  }
+
+  /* OBJECTIF */
+  .cv-objectif {
+    font-family: 'Playfair Display', serif;
+    font-size: 9.5pt;
+    font-style: italic;
+    color: var(--body);
+    line-height: 1.7;
+    font-weight: 400;
+  }
+
+  /* EXPÉRIENCE */
+  .cv-exp-list { display: flex; flex-direction: column; gap: 12px; }
+  .cv-exp-item { position: relative; padding-left: 13px; break-inside: avoid; }
+  .cv-exp-item::before {
+    content: '';
+    position: absolute; left: 0; top: 6px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .cv-exp-title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .cv-exp-context {
+    font-size: 7.5pt;
+    color: var(--teal);
+    font-weight: 600;
+    margin-top: 1px;
+  }
+  .cv-exp-desc {
+    font-size: 8pt;
+    color: var(--body);
+    margin-top: 3px;
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  /* FORMATION */
+  .cv-form-list { display: flex; flex-direction: column; gap: 9px; }
+  .cv-form-item { padding-left: 13px; position: relative; break-inside: avoid; }
+  .cv-form-item::before {
+    content: '';
+    position: absolute; left: 0; top: 5px;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--teal);
+  }
+  .cv-form-title { font-size: 9pt; font-weight: 600; color: var(--text); }
+  .cv-form-sub { font-size: 7.5pt; color: var(--muted); font-style: italic; margin-top: 1px; }
+
+  /* SIDEBAR — COMPÉTENCES avec barres simples */
+  .cv-skill-list { display: flex; flex-direction: column; gap: 9px; }
+  .cv-skill-name {
+    font-size: 8.5pt;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .cv-skill-bar {
+    height: 3px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .cv-skill-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--teal-dark), var(--teal-mid));
+  }
+
+  /* SIDEBAR — LANGUES */
+  .cv-lang-list { display: flex; flex-direction: column; gap: 8px; }
+  .cv-lang-item { display: flex; flex-direction: column; gap: 1px; }
+  .cv-lang-name { font-size: 8.5pt; font-weight: 600; color: var(--text); }
+  .cv-lang-level { font-size: 7.5pt; color: var(--muted); font-style: italic; }
+
+  {% if preview_mode %}
+  body { background: #b0bdbd; padding-bottom: 64px; }
+  .page { margin: 20px auto 80px; }
+  .preview-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
+    background: var(--teal-dark);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; z-index: 1100;
+    font-family: 'Nunito', sans-serif; font-size: 12px; color: rgba(255,255,255,0.65);
+  }
+  .preview-bar strong { color: white; }
+  .preview-bar .timer { color: #ffaa55; font-weight: 700; margin-left: 8px; }
+  .preview-bar a {
+    background: var(--accent); color: white;
+    padding: 9px 22px; border-radius: 4px;
+    text-decoration: none; font-weight: 700; font-size: 12px;
+  }
+  {% endif %}
+
+  @media print {
+    html, body { margin: 0; padding: 0; background: white; }
+    .page { margin: 0; box-shadow: none; }
+    .preview-bar { display: none !important; }
+  }
+</style>
+</head>
+<body>
+{% if preview_mode %}
+<div class="preview-bar">
+  <span>Aperçu · <strong>CV Professionnel</strong> · {{ cv.nom }} <span class="timer" id="timer">01:00</span></span>
+  <a href="/success/{{ cv.id }}">Payer &amp; Télécharger →</a>
+</div>
+<script>
+  let t = 60;
+  const el = document.getElementById('timer');
+  const c = setInterval(() => {
+    if (t <= 0) { clearInterval(c); window.location.href="/success/{{ cv.id }}"; return; }
+    el.textContent = "0" + Math.floor(t/60) + ":" + String(t%60).padStart(2,'0');
+    t--;
+  }, 1000);
+</script>
+{% endif %}
+
+<div class="page">
+  <!-- TOP -->
+  <div class="cv-top">
+    <div class="cv-top-inner">
+      {% if cv.photo_base64 %}
+        <img class="cv-photo" src="{{ cv.photo_base64 }}" alt="">
+      {% else %}
+        <div class="cv-photo-ph">👤</div>
+      {% endif %}
+      <div class="cv-top-text">
+        <div class="cv-name">{{ cv.nom }}</div>
+        {% if cv.poste %}<div class="cv-poste">{{ cv.poste }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="cv-accent-strip"></div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="cv-contacts">
+    {% if cv.email %}<div class="cv-contact-item">✉ {{ cv.email }}</div>{% endif %}
+    {% if cv.telephone %}<div class="cv-contact-item">✆ {{ cv.telephone }}</div>{% endif %}
+    {% if cv.ville or cv.pays %}<div class="cv-contact-item">◎ {{ cv.ville }}{% if cv.ville and cv.pays %}, {% endif %}{{ cv.pays }}</div>{% endif %}
+  </div>
+
+  <div class="cv-body">
+
+    <!-- SIDEBAR -->
+    <div class="cv-sidebar">
+
+      {% if cv.competences %}
+      <div class="cv-section">
+        <div class="cv-section-title">Compétences</div>
+        <div class="cv-skill-list">
+          {% set widths = [90, 82, 75, 88, 78, 92, 70, 85, 80, 72] %}
+          {% for item in cv.competences %}
+          <div>
+            <div class="cv-skill-name">{{ item }}</div>
+            <div class="cv-skill-bar">
+              <div class="cv-skill-fill" style="width:{{ widths[loop.index0 % 10] }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if cv.langues %}
+      <div class="cv-section">
+        <div class="cv-section-title">Langues</div>
+        <div class="cv-lang-list">
+          {% for item in cv.langues %}
+          <div class="cv-lang-item">
+            {% if '(' in item %}
+            <span class="cv-lang-name">{{ item.split('(')[0].strip() }}</span>
+            <span class="cv-lang-level">{{ item.split('(')[1].rstrip(')') }}</span>
+            {% else %}<span class="cv-lang-name">{{ item }}</span>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="cv-main">
+
+      {% if cv.objectif %}
+      <div class="cv-section">
+        <div class="cv-section-title">Profil</div>
+        <p class="cv-objectif">{{ cv.objectif }}</p>
+      </div>
+      {% endif %}
+
+      {% if cv.experience %}
+      <div class="cv-section">
+        <div class="cv-section-title">Expérience professionnelle</div>
+        <div class="cv-exp-list">
+          {% for item in cv.experience %}
+          <div class="cv-exp-item">
+            {% if '—' in item %}
+              {% set parts = item.split('—') %}
+              <div class="cv-exp-title">{{ parts[0].strip() }}</div>
+              {% if parts|length >= 2 %}<div class="cv-exp-context">{{ parts[1].strip() }}</div>{% endif %}
+              {% if parts|length >= 3 %}<div class="cv-exp-desc">{{ (parts[2:]|join('—')).strip() }}</div>{% endif %}
+            {% elif '(' in item %}
+              <div class="cv-exp-title">{{ item.split('(')[0].strip() }}</div>
+              <div class="cv-exp-context">({{ item.split('(', 1)[1] }}</div>
+            {% else %}
+              <div class="cv-exp-title">{{ item }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if cv.formation %}
+      <div class="cv-section">
+        <div class="cv-section-title">Formation</div>
+        <div class="cv-form-list">
+          {% for item in cv.formation %}
+          <div class="cv-form-item">
+            {% if '—' in item %}
+              <div class="cv-form-title">{{ item.split('—')[0].strip() }}</div>
+              <div class="cv-form-sub">{{ item.split('—',1)[1].strip() }}</div>
+            {% else %}
+              <div class="cv-form-title">{{ item }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

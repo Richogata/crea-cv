@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV — {{ cv.nom }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1a1a;
+    --body: #333;
+    --muted: #666;
+    --light: #999;
+    --rule: #dedede;
+    --surface: #f5f5f4;
+    --header-bg: #ececea;
+    --accent: #2c5282;
+  }
+  @page { size: A4; margin: 0; }
+  html, body {
+    background: #ccc;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.6;
+    color: var(--body);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    margin: 20px auto;
+    box-shadow: 0 6px 40px rgba(0,0,0,0.14);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .cv-head {
+    background: var(--header-bg);
+    padding: 14mm 20mm 12mm;
+    border-bottom: 3px solid var(--accent);
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+
+  /* PHOTO RONDE — cv simple */
+  .cv-photo-wrap {
+    flex-shrink: 0;
+  }
+  .cv-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    display: block;
+  }
+  .cv-photo-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px dashed var(--rule);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: var(--light);
+  }
+
+  .cv-head-text { flex: 1; }
+  .cv-name {
+    font-family: 'Lora', serif;
+    font-size: 26pt;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.4px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cv-poste {
+    font-size: 9pt;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+  .cv-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    font-size: 8pt;
+    color: var(--muted);
+  }
+  .cv-meta-item { display: flex; align-items: center; gap: 5px; }
+
+  /* BODY */
+  .cv-body {
+    flex: 1;
+    padding: 12mm 20mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cv-summary {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 9.5pt;
+    color: var(--body);
+    line-height: 1.7;
+  }
+
+  .cv-section { margin-bottom: 15px; break-inside: avoid; }
+  .cv-section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+  .cv-section-head h2 {
+    font-family: 'Lora', serif;
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .cv-section-head::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* EXPÉRIENCE */
+  .cv-exp-list { display: flex; flex-direction: column; gap: 10px; }
+  .cv-exp-item { break-inside: avoid; }
+  .cv-exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 2px;
+  }
+  .cv-exp-title {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--ink);
+    font-family: 'Lora', serif;
+  }
+  .cv-exp-date {
+    font-size: 7.5pt;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .cv-exp-company {
+    font-size: 8.5pt;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 2px;
+  }
+  .cv-exp-desc { font-size: 8.5pt; color: var(--body); line-height: 1.6; }
+
+  /* FORMATION */
+  .cv-form-list { display: flex; flex-direction: column; gap: 8px; }
+  .cv-form-item { break-inside: avoid; }
+  .cv-form-title { font-size: 9.5pt; font-weight: 600; color: var(--ink); }
+  .cv-form-sub { font-size: 8pt; color: var(--muted); font-style: italic; margin-top: 1px; }
+
+  /* COMPÉTENCES */
+  .cv-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .cv-tag {
+    padding: 3px 10px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-size: 8pt;
+    color: var(--body);
+    font-weight: 500;
+  }
+
+  /* LANGUES */
+  .cv-lang-list { display: flex; flex-direction: column; gap: 5px; }
+  .cv-lang-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8.5pt;
+  }
+  .cv-lang-name { font-weight: 600; color: var(--ink); }
+  .cv-lang-level { color: var(--muted); font-size: 8pt; }
+
+  .cv-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 28px;
+  }
+
+  {% if preview_mode %}
+  body { background: #b8b8b8; padding-bottom: 64px; }
+  .page { margin: 20px auto 80px; }
+  .preview-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 58px;
+    background: #0f0f0f;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; z-index: 1100;
+    font-family: 'Source Sans 3', sans-serif; font-size: 13px; color: rgba(255,255,255,0.65);
+  }
+  .preview-bar strong { color: white; }
+  .preview-timer { color: #ff6b6b; font-weight: 700; font-size: 15px; margin-left: 10px; font-family: monospace; }
+  .preview-bar a {
+    background: #2c5282; color: white;
+    padding: 10px 24px; border-radius: 6px;
+    text-decoration: none; font-weight: 700; font-size: 13px;
+    transition: background 0.2s;
+  }
+  .preview-bar a:hover { background: #1a365d; }
+  {% endif %}
+
+  @media print {
+    html, body { margin: 0; padding: 0; background: white; }
+    .page { margin: 0; box-shadow: none; }
+    .preview-bar { display: none !important; }
+  }
+</style>
+</head>
+<body>
+{% if preview_mode %}
+<div class="preview-bar">
+  <span>Aperçu · <strong>CV Simple</strong> · {{ cv.nom }} — <span class="preview-timer" id="timer">01:00</span></span>
+  <a href="/success/{{ cv.id }}">Payer &amp; Télécharger →</a>
+</div>
+<script>
+  let t = 60;
+  const el = document.getElementById('timer');
+  const c = setInterval(() => {
+    if (t <= 0) { clearInterval(c); window.location.href = "/success/{{ cv.id }}"; return; }
+    el.textContent = "0" + Math.floor(t/60) + ":" + String(t%60).padStart(2,'0');
+    t--;
+  }, 1000);
+</script>
+{% endif %}
+
+<div class="page">
+  <header class="cv-head">
+    {% if cv.photo_base64 %}
+    <div class="cv-photo-wrap">
+      <img class="cv-photo" src="{{ cv.photo_base64 }}" alt="Photo de profil">
+    </div>
+    {% endif %}
+    <div class="cv-head-text">
+      <div class="cv-name">{{ cv.nom }}</div>
+      {% if cv.poste %}<div class="cv-poste">{{ cv.poste }}</div>{% endif %}
+      <div class="cv-meta">
+        {% if cv.email %}<div class="cv-meta-item">✉ {{ cv.email }}</div>{% endif %}
+        {% if cv.telephone %}<div class="cv-meta-item">✆ {{ cv.telephone }}</div>{% endif %}
+        {% if cv.ville or cv.pays %}<div class="cv-meta-item">◎ {{ cv.ville }}{% if cv.ville and cv.pays %}, {% endif %}{{ cv.pays }}</div>{% endif %}
+      </div>
+    </div>
+  </header>
+
+  <div class="cv-body">
+    {% if cv.objectif %}
+    <div class="cv-summary">{{ cv.objectif }}</div>
+    {% endif %}
+
+    {% if cv.experience %}
+    <section class="cv-section">
+      <div class="cv-section-head"><h2>Expérience professionnelle</h2></div>
+      <div class="cv-exp-list">
+        {% for item in cv.experience %}
+        <div class="cv-exp-item">
+          {% if '—' in item %}
+            {% set parts = item.split('—') %}
+            <div class="cv-exp-header">
+              <div class="cv-exp-title">{{ parts[0].strip() }}</div>
+              {% if parts|length >= 2 %}<div class="cv-exp-date">{{ parts[1].strip() }}</div>{% endif %}
+            </div>
+            {% if parts|length >= 3 %}<div class="cv-exp-company">{{ parts[2].strip() }}</div>{% endif %}
+            {% if parts|length >= 4 %}<div class="cv-exp-desc">{{ (parts[3:]|join('—')).strip() }}</div>{% endif %}
+          {% elif '(' in item %}
+            <div class="cv-exp-header">
+              <div class="cv-exp-title">{{ item.split('(')[0].strip() }}</div>
+            </div>
+            <div class="cv-exp-company">({{ item.split('(', 1)[1] }}</div>
+          {% else %}
+            <div class="cv-exp-title">{{ item }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if cv.formation %}
+    <section class="cv-section">
+      <div class="cv-section-head"><h2>Formation</h2></div>
+      <div class="cv-form-list">
+        {% for item in cv.formation %}
+        <div class="cv-form-item">
+          {% if '—' in item %}
+            <div class="cv-form-title">{{ item.split('—')[0].strip() }}</div>
+            <div class="cv-form-sub">{{ item.split('—',1)[1].strip() }}</div>
+          {% else %}
+            <div class="cv-form-title">{{ item }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <div class="cv-two-col">
+      {% if cv.competences %}
+      <section class="cv-section">
+        <div class="cv-section-head"><h2>Compétences</h2></div>
+        <div class="cv-tags">
+          {% for item in cv.competences %}<span class="cv-tag">{{ item }}</span>{% endfor %}
+        </div>
+      </section>
+      {% endif %}
+      {% if cv.langues %}
+      <section class="cv-section">
+        <div class="cv-section-head"><h2>Langues</h2></div>
+        <div class="cv-lang-list">
+          {% for item in cv.langues %}
+          <div class="cv-lang-item">
+            {% if '(' in item %}
+            <span class="cv-lang-name">{{ item.split('(')[0].strip() }}</span>
+            <span class="cv-lang-level">{{ item.split('(')[1].rstrip(')') }}</span>
+            {% else %}<span class="cv-lang-name">{{ item }}</span>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    </div>
+  </div>
+</div>
+</body>
+</html>

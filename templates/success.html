@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV Généré — CréaCV</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f; --paper: #faf9f7; --gold: #c9943a;
+    --gold-light: #f0d98f; --muted: #6b6560; --border: #e2ded8;
+    --green: #25d366; --green-dark: #1aab53;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    background: #e8f5e9;
+    border: 2px solid #a5d6a7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    margin: 0 auto 22px;
+    animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes pop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+
+  .recap-box {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .recap-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .recap-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .recap-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .recap-label { color: var(--muted); }
+  .recap-value { font-weight: 500; }
+  .recap-ref { font-family: monospace; font-size: 12px; color: var(--gold); background: rgba(201,148,58,0.1); padding: 2px 8px; border-radius: 4px; }
+
+  /* PRICE BANNER */
+  .price-banner {
+    background: linear-gradient(135deg, rgba(201,148,58,0.14), rgba(201,148,58,0.04));
+    border: 2px solid rgba(201,148,58,0.5);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .price-left { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .price-left strong { color: var(--ink); }
+  .price-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--gold);
+    white-space: nowrap;
+    font-weight: 400;
+  }
+  .price-currency { font-size: 14px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 500; }
+
+  /* STEPS */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 14px;
+    margin-top: 8px;
+  }
+  .steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 26px; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+  .step-num.done { background: #e8f5e9; border-color: #a5d6a7; color: #2e7d32; }
+  .step-num.active { background: var(--gold); border-color: var(--gold); color: white; }
+  .step-label { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ACTIONS */
+  .action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.2s;
+    background: white;
+  }
+  .action-btn:hover { border-color: var(--gold); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .action-btn .icon { font-size: 24px; flex-shrink: 0; }
+  .action-btn .label { font-size: 14px; font-weight: 600; }
+  .action-btn .sublabel { font-size: 12px; color: var(--muted); }
+
+  /* LINK COPY */
+  .link-copy {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    align-items: center;
+  }
+  .link-copy input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    background: white;
+    outline: none;
+    font-family: monospace;
+  }
+  .copy-btn {
+    padding: 10px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .copy-btn.copied { background: var(--gold); color: white; border-color: var(--gold); }
+
+  /* WHATSAPP */
+  .wa-cta {
+    background: var(--green);
+    color: white;
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 24px rgba(37,211,102,0.3);
+  }
+  .wa-cta:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,211,102,0.35); }
+  .wa-icon { font-size: 34px; flex-shrink: 0; }
+  .wa-text strong { display: block; font-size: 17px; font-weight: 700; }
+  .wa-text span { font-size: 13px; opacity: 0.9; }
+  .wa-num { font-size: 14px; font-weight: 700; opacity: 0.85; margin-left: auto; white-space: nowrap; }
+
+  /* BEGINNER GUIDE */
+  .beginner-guide {
+    background: #fffbf0;
+    border: 1.5px solid #ffe0a0;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .beginner-guide-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
+  .mini-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+  .mini-step:last-child { margin-bottom: 0; }
+  .mini-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--gold); color: white;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .mini-text { font-size: 13px; color: #5d4037; line-height: 1.5; }
+
+  /* DOWNLOAD AVAILABLE */
+  .download-ready {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8f1);
+    border: 2px solid #a5d6a7;
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .download-ready .check-big { font-size: 40px; margin-bottom: 10px; }
+  .download-ready h3 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: 8px; color: #1b5e20; }
+  .download-ready p { font-size: 13px; color: #2e7d32; margin-bottom: 16px; }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #2e7d32;
+    color: white;
+    padding: 16px 36px;
+    border-radius: 100px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(46,125,50,0.3);
+  }
+  .btn-download:hover { background: #1b5e20; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(46,125,50,0.4); }
+
+  .badge-template {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge-simple { background: #f1f5f9; color: #64748b; }
+  .badge-professionnel { background: #e0f8f0; color: #1b6b6b; }
+  .badge-premium { background: #1c2030; color: #e8b96a; }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-top: 12px;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  @media (max-width: 500px) {
+    .action-grid { grid-template-columns: 1fr; }
+    .price-banner { flex-direction: column; align-items: flex-start; }
+    .wa-num { display: none; }
+  }
+</style>
+</head>
+<body>
+{% set tpl_labels = {'simple':'Simple','professionnel':'Professionnel','premium':'Premium'} %}
+{% set amount = TEMPLATE_PRICES_FCFA.get(client.template, 1000) %}
+{% set tpl_label = tpl_labels.get(client.template, client.template|capitalize) %}
+
+<div class="page">
+
+  <div class="success-icon">✓</div>
+  <h1>Votre CV est <em>prêt</em> !</h1>
+  <p class="subtitle">Bravo ! Votre CV a été créé avec succès.<br>Visualisez-le, puis payez pour obtenir votre PDF.</p>
+
+  <!-- RECAP -->
+  <div class="recap-box">
+    <div class="recap-title">📋 Récapitulatif</div>
+    <div class="recap-row">
+      <span class="recap-label">Nom</span>
+      <span class="recap-value">{{ client.nom }}</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">Poste</span>
+      <span class="recap-value">{{ client.poste }}</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">Template</span>
+      <span class="recap-value"><span class="badge-template badge-{{ client.template }}">{{ tpl_label }}</span></span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">Référence CV</span>
+      <span class="recap-value"><span class="recap-ref">{{ client.id }}</span></span>
+    </div>
+  </div>
+
+  <!-- PRIX -->
+  <div class="price-banner">
+    <div class="price-left">
+      Montant à payer pour le template <strong>{{ tpl_label }}</strong><br>
+      PDF couleur haute qualité · prêt à imprimer ou envoyer par email
+    </div>
+    <div>
+      <div class="price-amount">{{ amount }}</div>
+      <div class="price-currency">FCFA</div>
+    </div>
+  </div>
+
+  <!-- BOUTONS ACTIONS -->
+  <div class="action-grid">
+    <a href="/preview/{{ client.id }}" class="action-btn" target="_blank">
+      <span class="icon">👁</span>
+      <div>
+        <div class="label">Voir l'aperçu</div>
+        <div class="sublabel">Visualiser votre CV (1 min)</div>
+      </div>
+    </a>
+    <a href="/download/{{ client.id }}" class="action-btn">
+      <span class="icon">📥</span>
+      <div>
+        <div class="label">Télécharger</div>
+        <div class="sublabel">Après validation paiement</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- LIEN APERÇU -->
+  <div class="link-copy">
+    <input type="text" id="preview-link" value="{{ request.host_url }}preview/{{ client.id }}" readonly onclick="this.select()">
+    <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copier le lien</button>
+  </div>
+
+  {% if client.paid %}
+  <!-- PAIEMENT VALIDÉ — TÉLÉCHARGEMENT DIRECT -->
+  <div class="download-ready">
+    <div class="check-big">🎉</div>
+    <h3>Paiement validé — Téléchargez votre CV !</h3>
+    <p>Votre paiement a été confirmé. Votre PDF est disponible immédiatement.</p>
+    <a href="/download/{{ client.id }}" class="btn-download">
+      ⬇ Télécharger mon CV PDF
+    </a>
+  </div>
+  {% else %}
+  <!-- ÉTAPES -->
+  <div class="section-label">📌 Comment obtenir votre CV PDF</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num done">✓</div>
+      <div>
+        <div class="step-label">Étape 1 — CV créé ✅</div>
+        <div class="step-desc">Votre CV a été généré. Cliquez sur <strong>Voir l'aperçu</strong> pour le visualiser pendant 1 minute.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num active">2</div>
+      <div>
+        <div class="step-label">Étape 2 — Payer via WhatsApp</div>
+        <div class="step-desc">Appuyez sur le bouton vert <strong>Payer via WhatsApp</strong> ci-dessous. Le message est déjà rédigé, appuyez juste sur <strong>Envoyer</strong>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-label">Étape 3 — Confirmation Mobile Money</div>
+        <div class="step-desc">Effectuez le paiement <strong>Flooz / T-Money</strong> et envoyez-nous la photo de confirmation. Validation dans les <strong>30 minutes</strong> (heures ouvrables).</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-label">Étape 4 — Téléchargez votre CV PDF 🎉</div>
+        <div class="step-desc">Une fois votre paiement validé par notre équipe, revenez sur cette page et cliquez sur <strong>Télécharger</strong>. Le PDF sera disponible immédiatement, sans clé ni code.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAIEMENT WHATSAPP -->
+  <div class="section-label">💳 Payer maintenant</div>
+  {% set wa_msg = "Bonjour 👋 Je souhaite payer pour télécharger mon CV.\n\n📋 Informations :\n• Nom : " ~ client.nom ~ "\n• Template : " ~ tpl_label ~ "\n• Montant : " ~ amount ~ " FCFA\n• Référence : " ~ client.id ~ "\n\n👁 Aperçu : " ~ request.host_url ~ "preview/" ~ client.id %}
+  <a href="https://wa.me/22898489984?text={{ wa_msg|urlencode }}" class="wa-cta" target="_blank">
+    <div class="wa-icon">💬</div>
+    <div class="wa-text">
+      <strong>Payer via WhatsApp — {{ amount }} FCFA</strong>
+      <span>Cliquez ici — le message est déjà prêt, appuyez juste sur Envoyer !</span>
+    </div>
+    <div class="wa-num">+228 98 48 99 84</div>
+  </a>
+
+  <!-- GUIDE DÉBUTANT -->
+  <div class="beginner-guide">
+    <div class="beginner-guide-title">📱 Guide simple (étape par étape)</div>
+    <div class="mini-step">
+      <div class="mini-num">1</div>
+      <div class="mini-text">Appuyez sur le bouton vert <strong>"Payer via WhatsApp"</strong> ci-dessus</div>
+    </div>
+    <div class="mini-step">
+      <div class="mini-num">2</div>
+      <div class="mini-text">WhatsApp s'ouvre avec un message déjà écrit → Appuyez simplement sur <strong>Envoyer</strong></div>
+    </div>
+    <div class="mini-step">
+      <div class="mini-num">3</div>
+      <div class="mini-text">Nous vous envoyons le <strong>numéro Mobile Money</strong> (Flooz ou T-Money) pour effectuer le paiement</div>
+    </div>
+    <div class="mini-step">
+      <div class="mini-num">4</div>
+      <div class="mini-text">Effectuez le paiement et <strong>envoyez-nous la photo</strong> de la confirmation sur WhatsApp</div>
+    </div>
+    <div class="mini-step">
+      <div class="mini-num">5</div>
+      <div class="mini-text">Nous validons et vous revenez ici pour <strong>télécharger votre CV</strong> directement ✅</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <a href="/" class="back-link">← Créer un autre CV</a>
+
+</div>
+
+<script>
+function copyLink() {
+  const input = document.getElementById('preview-link');
+  const btn = document.getElementById('copy-btn');
+  input.select();
+  navigator.clipboard.writeText(input.value).then(() => {
+    btn.textContent = '✓ Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier le lien'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    document.execCommand('copy');
+    btn.textContent = '✓ Copié !';
+    setTimeout(() => btn.textContent = 'Copier le lien', 2000);
+  });
+}
+</script>
+</body>
+</html>
