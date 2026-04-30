@@ -42,7 +42,7 @@ app = Flask(
 )
 app.secret_key = os.environ.get("SECRET_KEY", "cv_saas_secret_2024")
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Silas1007")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
