@@ -42,7 +42,7 @@ app = Flask(
 )
 app.secret_key = os.environ.get("SECRET_KEY", "cv_saas_secret_2024")
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Silas1007")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
@@ -291,19 +291,12 @@ def download(client_id):
     client = get_client(client_id)
     if not client:
         abort(404)
+    # Pas encore payé → page de paiement
     if not client["paid"]:
         return render_template("payment_required.html", client=client)
-
-    pdf_path = os.path.join(PDF_DIR, f"{client_id}.pdf")
-    if not os.path.exists(pdf_path):
-        ok = generate_pdf(client_id)
-        if not ok or not os.path.exists(pdf_path):
-            flash("Erreur PDF. Contactez l'administrateur.", "error")
-            return redirect(url_for("success", client_id=client_id))
-
-    nom_fichier = f"CV_{client['nom'].replace(' ', '_')}.pdf"
-    return send_file(pdf_path, as_attachment=True,
-                     download_name=nom_fichier, mimetype="application/pdf")
+    # Payé → page impression navigateur (sans WeasyPrint, fonctionne partout)
+    data = prepare_cv_data(client)
+    return render_template("cv_download.html", cv=data)
 
 
 # ── Routes Admin ─────────────────────────────────────────────────────────────

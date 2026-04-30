@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Télécharger CV — {{ cv.nom }}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --gold: #c9943a; }
+
+  html, body { height: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: #1a1a1a; }
+
+  /* ── BARRE HAUTE ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px;
+    background: #0f0f0f;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid #333;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-left .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #25d366; box-shadow: 0 0 8px #25d366;
+  }
+  .topbar-left strong { color: white; font-size: 14px; }
+  .topbar-left span { color: rgba(255,255,255,0.4); font-size: 12px; margin-left: 4px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .btn {
+    padding: 9px 20px; border-radius: 7px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border: none; display: flex; align-items: center; gap: 7px;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .btn-ghost {
+    background: transparent; color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .btn-ghost:hover { color: white; border-color: rgba(255,255,255,0.35); }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #a87830; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,148,58,0.4); }
+
+  /* ── GUIDE ── */
+  .guide {
+    position: fixed; top: 56px; left: 0; right: 0; z-index: 99;
+    background: #fffbf0;
+    border-bottom: 1px solid #ffe0a0;
+    padding: 9px 24px;
+    display: flex; align-items: center; gap: 16px;
+    font-size: 12.5px; color: #7c5c00;
+    flex-wrap: wrap;
+  }
+  .guide strong { color: #5d4200; }
+  .guide-step { display: flex; align-items: center; gap: 6px; }
+  .guide-num {
+    width: 17px; height: 17px; border-radius: 50%;
+    background: var(--gold); color: white;
+    font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .guide-close { margin-left: auto; cursor: pointer; color: #a07030; font-size: 17px; padding: 0 2px; }
+
+  /* ── IFRAME ── */
+  .cv-frame-wrap {
+    position: fixed;
+    top: 100px; /* 56 topbar + 44 guide */
+    left: 0; right: 0; bottom: 0;
+    overflow: auto;
+    background: #555;
+    display: flex; justify-content: center;
+    padding: 20px 0 40px;
+  }
+  .cv-frame-wrap iframe {
+    width: 210mm;
+    min-height: 297mm;
+    border: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    background: white;
+    flex-shrink: 0;
+  }
+
+  /* ── MODAL GUIDE CHROME ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 16px;
+    padding: 32px; max-width: 440px; width: 90%;
+    text-align: center;
+  }
+  .modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 12px; }
+  .modal p { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 20px; }
+  .modal-steps { text-align: left; margin-bottom: 24px; }
+  .modal-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; font-size: 13px; color: #333; }
+  .modal-step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--gold); color: white;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .modal-img {
+    background: #f5f5f5; border-radius: 8px;
+    padding: 12px; margin-bottom: 20px;
+    font-size: 12px; color: #888; font-family: monospace;
+    text-align: left; border: 1px solid #e0e0e0;
+  }
+  .modal-img .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; color: #856404; font-weight: 700; }
+  .btn-modal-ok {
+    background: var(--gold); color: white;
+    border: none; padding: 13px 36px; border-radius: 8px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; width: 100%;
+  }
+  .btn-modal-ok:hover { background: #a87830; }
+</style>
+</head>
+<body>
+
+<!-- BARRE HAUTE -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="dot"></div>
+    <div>
+      <strong>CV de {{ cv.nom }}</strong>
+      <span>· {{ cv.template|capitalize }} · Payé ✓</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <a href="/success/{{ cv.id }}" class="btn btn-ghost">← Retour</a>
+    <button class="btn btn-gold" onclick="telecharger()">⬇ Télécharger en PDF</button>
+  </div>
+</div>
+
+<!-- GUIDE RAPIDE -->
+<div class="guide" id="guide">
+  <strong>💡 Comment obtenir votre PDF :</strong>
+  <div class="guide-step"><div class="guide-num">1</div> Cliquez <strong>"Télécharger en PDF"</strong></div>
+  <div class="guide-step"><div class="guide-num">2</div> Dans la fenêtre qui s'ouvre → <strong>Destination : Enregistrer en PDF</strong></div>
+  <div class="guide-step"><div class="guide-num">3</div> Cliquez <strong>Enregistrer</strong> ✅</div>
+  <span class="guide-close" onclick="fermerGuide()">✕</span>
+</div>
+
+<!-- IFRAME DU CV (preview payé = sans bandeau) -->
+<div class="cv-frame-wrap" id="frame-wrap">
+  <iframe id="cv-iframe"
+    src="/preview/{{ cv.id }}"
+    title="CV {{ cv.nom }}"
+    onload="frameLoaded()">
+  </iframe>
+</div>
+
+<!-- MODAL GUIDE IMPRESSION -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>📄 Sauvegarder en PDF</h3>
+    <p>Une fenêtre d'impression va s'ouvrir. Suivez ces étapes :</p>
+    <div class="modal-steps">
+      <div class="modal-step">
+        <div class="modal-step-num">1</div>
+        <div>Dans <strong>"Destination"</strong>, sélectionnez <strong>"Enregistrer en PDF"</strong> (ou "Save as PDF")</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-step-num">2</div>
+        <div>Vérifiez que le format est <strong>A4</strong> et les marges sur <strong>Aucune</strong> (None)</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-step-num">3</div>
+        <div>Cliquez sur <strong>"Enregistrer"</strong> et choisissez où sauvegarder votre CV</div>
+      </div>
+    </div>
+    <div class="modal-img">
+      Destination : <span class="highlight">Enregistrer en PDF</span><br>
+      Format : <span class="highlight">A4</span><br>
+      Marges : <span class="highlight">Aucune</span>
+    </div>
+    <button class="btn-modal-ok" onclick="confirmerImpression()">
+      OK — Ouvrir la fenêtre d'impression
+    </button>
+  </div>
+</div>
+
+<script>
+const iframeEl = document.getElementById('cv-iframe');
+
+function frameLoaded() {
+  // Ajuster la hauteur de l'iframe au contenu
+  try {
+    const h = iframeEl.contentDocument.body.scrollHeight;
+    if (h > 800) iframeEl.style.height = h + 'px';
+  } catch(e) {
+    iframeEl.style.height = '297mm';
+  }
+}
+
+function fermerGuide() {
+  const g = document.getElementById('guide');
+  g.style.display = 'none';
+  document.getElementById('frame-wrap').style.top = '56px';
+}
+
+function telecharger() {
+  // Afficher le modal d'explication avant d'imprimer
+  document.getElementById('modal').classList.add('show');
+}
+
+function confirmerImpression() {
+  document.getElementById('modal').classList.remove('show');
+  // Imprimer l'iframe (= le CV seul, sans la barre)
+  setTimeout(() => {
+    try {
+      iframeEl.contentWindow.focus();
+      iframeEl.contentWindow.print();
+    } catch(e) {
+      // Fallback : ouvrir dans un nouvel onglet et imprimer
+      const win = window.open('/preview/{{ cv.id }}', '_blank');
+      win.addEventListener('load', () => { win.print(); });
+    }
+  }, 300);
+}
+
+// Fermer modal si clic en dehors
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show');
+});
+</script>
+
+</body>
+</html>
