@@ -1,635 +1,2107 @@
 <!DOCTYPE html>
+<!--
+════════════════════════════════════════════════════════
+  CVCRAFT — GÉNÉRATEUR DE CV AFRIQUE DE L'OUEST v7
+  Instructions de déploiement et mise en ligne
+════════════════════════════════════════════════════════
+ÉTAPE 1 — Déploie le fichier (choisis une option) :
+  › Netlify  : va sur netlify.com/drop → glisse-dépose → c'est en ligne
+  › GitHub   : crée un repo → upload → Settings → Pages → Branch main
+  › cPanel   : upload dans public_html via le gestionnaire de fichiers
+ÉTAPE 2 — Mets à jour CONFIG.SITE_URL dans le code :
+  › Cherche : SITE_URL: 'https://votre-site.com'
+  › Remplace par ton vrai domaine après déploiement
+ÉTAPE 3 — Vérifie tes liens LeekPay sur leekpay.me
+  › Dans chaque lien, configure l'URL de retour : TON_DOMAINE?cv_paid=1
+ÉTAPE 4 — Teste un paiement complet avec tes vraies infos
+ÉTAPE 5 — Dashboard admin : identifiant admin / mot de passe JESUS
+  → Change immédiatement ton mot de passe dans Paramètres
+SUPPORT TECHNIQUE : wa.me/22898489984
+════════════════════════════════════════════════════════
+-->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CréaCV — Votre CV Professionnel en Minutes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>CVCraft — Générateur de CV Professionnel</title>
+<meta property="og:title" content="CVCraft — Crée ton CV professionnel en 2 minutes">
+<meta property="og:description" content="Générateur de CV adapté à l'Afrique de l'Ouest. Paiement Wave, MoMo, OPay. PDF instantané dès 1 000 FCFA.">
+<meta name="twitter:card" content="summary_large_image">
+<!-- LeekPay SDK -->
+<script src="https://leekpay.fr/js/leekpay.js" onerror="window.LeekPaySDKFailed=true" defer></script>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Oswald:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #0f0f0f;
-    --paper: #faf9f7;
-    --gold: #c9943a;
-    --gold-light: #f0d98f;
-    --muted: #6b6560;
-    --border: #e2ded8;
-    --error: #c0392b;
-    --success: #27ae60;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    min-height: 100vh;
-  }
+/* ═══════════════ DESIGN TOKENS v6 ═══════════════ */
+:root{
+  --paper:#F7F4EE;--paper2:#EDE8DF;--paper3:#DDD7CB;
+  --void:#0A0908;--void2:#1A1915;--void3:#2C2820;
+  --amber:#A06820;--amberl:#C8943A;--amberp:rgba(160,104,32,.12);
+  --forest:#1E5C3A;--ocean:#183868;--ruby:#621428;
+  --ash:#5A5550;--mist:rgba(10,9,8,.08);--ghost:rgba(10,9,8,.04);
+  --FD:'Libre Baskerville',serif;--FU:'DM Sans',sans-serif;
+  --FM:'Fira Mono',monospace;--FT:'Oswald',sans-serif;
+  --r:2px;--rm:10px;--rl:18px;
+  --e1:0 1px 4px rgba(0,0,0,.07);--e2:0 4px 20px rgba(0,0,0,.1);--e3:0 12px 48px rgba(0,0,0,.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--FU);background:var(--paper);color:var(--void);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:var(--FU)}
+input,textarea,select{font-family:var(--FU)}
+.page{display:none;min-height:100vh}.page.active{display:block}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9997;opacity:.12;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes aFD{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes aMQ{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes aSP{0%,100%{opacity:1}50%{opacity:.18}}
+@keyframes popIn{from{transform:scale(0) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* HERO */
-  .hero {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 80px 40px 60px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 30% 50%, rgba(201,148,58,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 20%, rgba(201,148,58,0.08) 0%, transparent 50%);
-  }
-  .hero-badge {
-    display: inline-block;
-    border: 1px solid rgba(201,148,58,0.5);
-    color: var(--gold-light);
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    padding: 6px 16px;
-    border-radius: 100px;
-    margin-bottom: 28px;
-    position: relative;
-  }
-  .hero h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    line-height: 1.1;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  .hero h1 em {
-    font-style: italic;
-    color: var(--gold-light);
-  }
-  .hero p {
-    font-size: 1.1rem;
-    color: rgba(250,249,247,0.7);
-    max-width: 520px;
-    margin: 0 auto 40px;
-    font-weight: 300;
-    line-height: 1.7;
-    position: relative;
-  }
-  .hero-scroll {
-    display: inline-block;
-    color: var(--gold-light);
-    font-size: 13px;
-    letter-spacing: 1px;
-    position: relative;
-    cursor: pointer;
-    text-decoration: none;
-  }
-  .hero-scroll::after {
-    content: '↓';
-    display: block;
-    margin-top: 8px;
-    font-size: 20px;
-    animation: bounce 1.5s infinite;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(6px); }
-  }
+/* ═══ NAV ═══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:700;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 44px;background:rgba(247,244,238,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--mist)}
+.nav-logo{display:flex;align-items:center;gap:9px;cursor:pointer}
+.nav-em{width:30px;height:30px;background:var(--void);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:var(--FT);font-size:14px;font-weight:600;color:var(--amberl);letter-spacing:1px}
+.nav-wm{font-family:var(--FD);font-size:20px;font-weight:700;letter-spacing:-.3px}
+.nav-wm em{font-style:italic;color:var(--amber)}
+.nav-r{display:flex;gap:8px;align-items:center}
+.nb{height:34px;padding:0 17px;border:none;border-radius:2px;font-size:13px;font-weight:500;transition:all .16s;font-family:var(--FU);cursor:pointer;letter-spacing:.1px}
+.nb-g{background:transparent;color:var(--ash)}.nb-g:hover{background:var(--ghost);color:var(--void)}
+.nb-s{background:var(--void);color:var(--paper)}.nb-s:hover{background:var(--void2);transform:translateY(-1px)}
+.nb-am{background:var(--amber);color:#fff;font-size:12px}.nb-am:hover{background:var(--void)}
+.nb-lang{background:var(--paper2);color:var(--ash);font-family:var(--FM);font-size:11px;letter-spacing:1px;padding:0 12px}
+.nb-lang:hover{background:var(--paper3);color:var(--void)}
 
-  /* TEMPLATES SECTION */
-  .templates-bar {
-    background: white;
-    border-bottom: 1px solid var(--border);
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .templates-bar span {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-right: 8px;
-  }
-  .tpl-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: 2px solid var(--border);
-    border-radius: 100px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-    background: white;
-    color: var(--muted);
-  }
-  .tpl-pill:hover { border-color: var(--gold); color: var(--ink); }
-  .tpl-pill.active { border-color: var(--gold); background: var(--gold); color: white; }
-  .tpl-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
-  .dot-simple { background: #94a3b8; }
-  .dot-pro { background: #1e3a5f; }
-  .dot-premium { background: var(--gold); }
+/* ═══ HERO ═══ */
+.hero{min-height:100vh;padding:120px 44px 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(160,104,32,.09) 0%,transparent 65%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--mist) 1px,transparent 1px),linear-gradient(90deg,var(--mist) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;opacity:.5}
+.hero-ey{display:inline-flex;align-items:center;gap:10px;margin-bottom:32px;padding:5px 18px;border:1px solid rgba(160,104,32,.4);font-family:var(--FM);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);animation:aFD .6s ease both}
+.hero-ey::before,.hero-ey::after{content:'◆';font-size:6px;opacity:.5}
+h1.hh{font-family:var(--FD);font-size:clamp(42px,6vw,78px);line-height:.95;letter-spacing:-2px;color:var(--void);margin-bottom:24px;animation:aFD .6s .08s ease both}
+h1.hh em{font-style:italic;color:var(--amber)}
+.hero-sub{font-size:clamp(15px,1.6vw,18px);color:var(--ash);max-width:460px;line-height:1.7;margin-bottom:44px;animation:aFD .6s .15s ease both;font-weight:300}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:aFD .6s .21s ease both}
+.cA{height:50px;padding:0 36px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:14px;font-weight:600;font-family:var(--FU);transition:all .2s;display:inline-flex;align-items:center;gap:9px;cursor:pointer}
+.cA:hover{transform:translateY(-2px);box-shadow:var(--e2);background:var(--void2)}
+.cB{height:50px;padding:0 28px;background:transparent;color:var(--void);border:1px solid rgba(10,9,8,.22);border-radius:2px;font-size:14px;font-family:var(--FU);transition:all .17s;cursor:pointer}
+.cB:hover{background:var(--ghost)}
+.hero-sc{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;font-family:var(--FM);font-size:9px;letter-spacing:2px;color:rgba(10,9,8,.3);animation:aFD .6s .38s ease both}
+.hero-sc-l{width:1px;height:42px;background:linear-gradient(to bottom,rgba(10,9,8,.3),transparent);animation:aSP 2s ease-in-out infinite}
 
-  /* FORM CONTAINER */
-  .form-section { padding: 60px 40px; max-width: 860px; margin: 0 auto; }
+/* MARQUEE */
+.mq{background:var(--void);padding:11px 0;overflow:hidden;white-space:nowrap}
+.mq-t{display:inline-block;animation:aMQ 30s linear infinite}
+.mq-i{display:inline-flex;align-items:center;gap:18px;font-family:var(--FM);font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:rgba(247,244,238,.3);padding:0 36px}
+.mq-i b{color:var(--amberl);font-weight:400}
 
-  .section-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem;
-    margin-bottom: 8px;
-  }
-  .section-subtitle {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin-bottom: 40px;
-  }
+/* HOW IT WORKS */
+.sec{padding:80px 44px;max-width:1160px;margin:0 auto}
+.stag{font-family:var(--FM);font-size:9.5px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.stag::after{content:'';flex:0 0 30px;height:1px;background:var(--amber)}
+.sh2{font-family:var(--FD);font-size:clamp(30px,4vw,50px);line-height:1.02;letter-spacing:-1.5px;color:var(--void);margin-bottom:8px}
+.sh2 em{font-style:italic;color:var(--amber)}
+.steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.step-c{background:#fff;border:1px solid var(--paper2);border-radius:var(--rl);padding:28px 24px;text-align:center;box-shadow:var(--e1);transition:all .25s cubic-bezier(.34,1.4,.64,1)}
+.step-c:hover{transform:translateY(-5px);box-shadow:var(--e3)}
+.step-num{width:44px;height:44px;border-radius:50%;background:var(--void);color:var(--amberl);font-family:var(--FM);font-size:13px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.step-c h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.step-c p{font-size:12.5px;color:var(--ash);line-height:1.6}
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-group.full { grid-column: 1 / -1; }
+/* CV EXAMPLE CARDS */
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:64px}
+.ex-card{border-radius:var(--rm);overflow:hidden;box-shadow:var(--e2);transition:all .3s cubic-bezier(.34,1.4,.64,1);cursor:pointer;background:#fff;border:1px solid var(--mist)}
+.ex-card:hover{transform:translateY(-6px);box-shadow:var(--e3)}
+.ex-lbl{position:absolute;top:11px;left:11px;background:rgba(10,9,8,.82);color:var(--paper);font-family:var(--FM);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:1px;z-index:2}
+.ex-price{position:absolute;top:11px;right:11px;background:var(--amber);color:#fff;font-family:var(--FM);font-size:9px;letter-spacing:.8px;padding:4px 10px;border-radius:1px;z-index:2}
+.ex-cv-zone{height:330px;overflow:hidden;position:relative}
+.ex-scale{transform:scale(0.43);transform-origin:top left;width:233%;height:233%;position:relative}
+.ex-footer{padding:14px 17px;background:#fff;border-top:1px solid var(--paper2);display:flex;justify-content:space-between;align-items:center}
+.ex-footer span{font-size:12.5px;font-weight:600;color:var(--void)}
+.ex-footer button{height:32px;padding:0 16px;background:var(--void);color:var(--paper);border:none;border-radius:1px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--FU);transition:all .15s}
+.ex-footer button:hover{background:var(--amber)}
 
-  label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  label .req { color: var(--gold); }
+/* PLAN CARDS */
+.pl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(10,9,8,.15);border:2px solid rgba(10,9,8,.15);border-radius:var(--rl);overflow:hidden;margin-bottom:36px}
+.pc{background:var(--paper);cursor:pointer;display:flex;flex-direction:column;position:relative;transition:all .22s cubic-bezier(.34,1.4,.64,1)}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .26s}
+.pc:hover::before{transform:scaleX(1)}
+.pc:hover{background:#fff;transform:translateY(-3px);box-shadow:var(--e3);z-index:2}
+.pc.feat{background:var(--void)}.pc.feat:hover{background:var(--void2)}
+.ppz{height:188px;overflow:hidden;border-bottom:1px solid rgba(10,9,8,.08);flex-shrink:0}
+.pc.feat .ppz{border-bottom-color:rgba(247,244,238,.06)}
+.pb{padding:22px 22px 25px;flex:1;display:flex;flex-direction:column}
+.pt{font-family:var(--FM);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:7px}
+.pc.feat .pt{color:var(--amberl)}
+.pn{font-family:var(--FD);font-size:26px;line-height:1;color:var(--void);margin-bottom:7px}
+.pc.feat .pn{color:var(--paper)}
+.pd{font-size:12px;line-height:1.55;color:var(--ash);margin-bottom:14px;flex:1}
+.pc.feat .pd{color:rgba(247,244,238,.46)}
+.pp{display:flex;align-items:baseline;gap:3px;margin-bottom:14px}
+.ppa{font-family:var(--FD);font-size:32px;letter-spacing:-1px;line-height:1;color:var(--void)}
+.pc.feat .ppa{color:var(--paper)}
+.ppc{font-size:12px;color:var(--ash);font-weight:300}
+.pc.feat .ppc{color:rgba(247,244,238,.38)}
+.pf{list-style:none;margin-bottom:18px;border-top:1px solid var(--mist);padding-top:12px}
+.pc.feat .pf{border-top-color:rgba(247,244,238,.07)}
+.pfi{display:flex;align-items:flex-start;gap:7px;padding:4px 0;font-size:11.5px;color:var(--ash);border-bottom:1px solid var(--ghost)}
+.pc.feat .pfi{color:rgba(247,244,238,.52);border-bottom-color:rgba(247,244,238,.04)}
+.pfi:last-child{border:none}
+.pfc{width:14px;height:14px;border-radius:50%;background:rgba(30,92,58,.1);color:var(--forest);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;margin-top:1px;font-weight:700}
+.pc.feat .pfc{background:rgba(200,148,58,.12);color:var(--amberl)}
+.pc-btn{width:100%;height:42px;border:none;border-radius:2px;font-size:13px;font-weight:600;font-family:var(--FU);letter-spacing:.1px;transition:all .17s;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer}
+.pc-btn-s{background:var(--void);color:var(--paper)}.pc-btn-s:hover{transform:translateY(-1px)}
+.pc-btn-p{background:var(--ocean);color:#fff}.pc-btn-p:hover{background:#0f2650;transform:translateY(-1px)}
+.pc-btn-x{background:var(--amber);color:var(--void)}.pc-btn-x:hover{background:#7A5010;color:#fff;transform:translateY(-1px)}
+.feat-badge{position:absolute;top:10px;right:10px;background:var(--amber);color:var(--void);font-family:var(--FM);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px}
 
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    background: white;
-    color: var(--ink);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-  }
-  input:focus, textarea:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(201,148,58,0.12);
-  }
-  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+/* FAQ */
+.faq-wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.faq-it{background:#fff;border:1px solid var(--paper2);border-radius:var(--rm);overflow:hidden}
+.faq-q{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:13.5px;font-weight:600;gap:12px}
+.faq-q::after{content:'↓';color:var(--amber);transition:transform .2s;flex-shrink:0;font-size:14px}
+.faq-it.open .faq-q::after{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s;font-size:13px;color:var(--ash);line-height:1.65;padding:0 18px}
+.faq-it.open .faq-a{max-height:200px;padding:0 18px 14px}
 
-  /* PHOTO UPLOAD */
-  .photo-upload {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: white;
-    position: relative;
-  }
-  .photo-upload:hover { border-color: var(--gold); background: rgba(201,148,58,0.03); }
-  .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-  .photo-upload-icon { font-size: 32px; margin-bottom: 10px; }
-  .photo-upload p { font-size: 14px; color: var(--muted); }
-  .photo-upload strong { color: var(--gold); }
-  #photo-preview {
-    display: none;
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin: 12px auto 0;
-    border: 3px solid var(--gold);
-  }
+/* FOOTER */
+.ft{background:var(--void);color:rgba(247,244,238,.36);padding:36px 44px;display:flex;align-items:center;justify-content:space-between;font-size:11.5px}
+.ft-lo{display:flex;align-items:center;gap:9px;color:var(--paper)}
+.ft-lb{width:26px;height:26px;background:var(--amber);display:flex;align-items:center;justify-content:center;border-radius:2px;font-family:var(--FT);font-size:13px;font-weight:600;color:var(--void)}
 
-  /* DIVIDER */
-  .form-divider {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 8px 0;
-  }
-  .form-divider span {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.1rem;
-    color: var(--ink);
-    white-space: nowrap;
-  }
-  .form-divider::before, .form-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+/* WA FLOAT */
+.wa-float{position:fixed;bottom:24px;right:20px;z-index:600;width:52px;height:52px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(37,211,102,.4);text-decoration:none;transition:all .2s}
+.wa-float:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(37,211,102,.5)}
 
-  .template-cards {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  .template-card {
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.25s;
-    position: relative;
-    background: white;
-  }
-  .template-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-  .template-card.selected { border-color: var(--gold); background: rgba(201,148,58,0.04); }
-  /* Pro card — look spécial */
-  #card-professionnel {
-    border-color: #1e3a5f;
-    background: linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%);
-  }
-  #card-professionnel:hover, #card-professionnel.selected {
-    border-color: #1e3a5f;
-    box-shadow: 0 8px 30px rgba(30,58,95,0.15);
-  }
-  /* Premium card — look prestige */
-  #card-premium {
-    border-color: var(--gold);
-    background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
-    color: #f0d98f;
-  }
-  #card-premium .template-name { color: #f0d98f; }
-  #card-premium .template-desc { color: rgba(240,217,143,0.7); }
-  #card-premium:hover, #card-premium.selected {
-    border-color: #f0d98f;
-    box-shadow: 0 8px 40px rgba(201,148,58,0.3);
-    transform: translateY(-4px);
-  }
-  #card-premium .check { border-color: rgba(240,217,143,0.4); }
-  #card-premium.selected .check { background: var(--gold); border-color: var(--gold); }
-  .template-card input[type="radio"] {
-    position: absolute; opacity: 0; pointer-events: none;
-  }
-  .template-card .check {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    position: absolute; top: 14px; right: 14px;
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .template-card.selected .check {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: white;
-    font-size: 11px;
-  }
-  .template-card.selected .check::after { content: '✓'; }
-  .template-preview { height: 100px; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-  /* Simple preview */
-  .preview-simple { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); display: flex; flex-direction: column; gap: 4px; padding: 12px; }
-  /* Pro preview */
-  .preview-pro { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%); display: flex; gap: 0; }
-  /* Premium preview */
-  .preview-premium { background: linear-gradient(135deg, #0f1218 0%, #1c2030 100%); position: relative; overflow: hidden; }
-  .preview-premium-glow {
-    position: absolute; top: -20px; left: 20px;
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,144,58,0.4) 0%, transparent 70%);
-  }
-  .preview-line { height: 6px; border-radius: 3px; background: rgba(0,0,0,0.12); }
-  .preview-line.short { width: 50%; }
-  .preview-line.medium { width: 75%; }
-  .preview-line.white { background: rgba(255,255,255,0.25); }
-  .preview-sidebar { width: 35%; background: rgba(0,0,0,0.35); padding: 10px 8px; display: flex; flex-direction: column; gap: 5px; }
-  .preview-main { flex: 1; padding: 10px 8px; display: flex; flex-direction: column; gap: 5px; }
-  .preview-gold { background: linear-gradient(90deg, #c9943a 0%, #f0d98f 100%); height: 3px; border-radius: 2px; width: 100%; }
-  .preview-dark-line { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.18); }
-  .preview-sidebar-dark { width: 38%; background: rgba(0,0,0,0.6); padding: 10px 7px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
-  .preview-hex { width: 20px; height: 20px; clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); background: rgba(200,144,58,0.5); margin-bottom: 3px; }
-  .preview-main-premium { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 5px; }
-  .template-name {
-    font-weight: 700; font-size: 15px; margin-bottom: 4px;
-  }
-  .template-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
-  .template-badge {
-    display: inline-block;
-    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
-    padding: 4px 10px; border-radius: 100px;
-    margin-top: 8px; font-weight: 700;
-  }
-  .badge-free { background: #e8f5e9; color: #2e7d32; }
-  .badge-pro { background: #e3f2fd; color: #1565c0; }
-  .badge-premium { background: rgba(201,148,58,0.2); color: #f0d98f; border: 1px solid rgba(201,148,58,0.3); }
+/* ═══ FORM PAGE ═══ */
+.fpage{padding-top:58px;min-height:100vh;background:var(--paper)}
+.fhero{background:var(--void);padding:38px 44px 32px;position:relative;overflow:hidden}
+.fhero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 100% at 100% 50%,rgba(160,104,32,.07),transparent 60%);pointer-events:none}
+.fhero-tag{font-family:var(--FM);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--amberl);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.fhero-tag::before{content:'';width:16px;height:1px;background:var(--amber)}
+.fhero h2{font-family:var(--FD);font-size:26px;color:var(--paper);letter-spacing:-.3px;margin-bottom:5px}
+.fhero p{font-size:13px;color:rgba(247,244,238,.38);line-height:1.5}
+.fprog{height:2px;background:rgba(247,244,238,.06);margin-top:20px}
+.fprog-b{height:100%;background:var(--amber);transition:width .4s ease;width:8%}
 
-  /* SUBMIT */
-  .submit-area {
-    grid-column: 1 / -1;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  .btn-submit {
-    background: var(--gold);
-    color: white;
-    border: none;
-    padding: 18px 60px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: all 0.3s;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-submit:hover { background: #b8832a; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,148,58,0.35); }
-  .btn-submit:active { transform: translateY(0); }
-  .btn-submit.loading { pointer-events: none; opacity: 0.8; }
-  .btn-submit .spinner {
-    display: none;
-    width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  .btn-submit.loading .spinner { display: inline-block; }
-  .btn-submit.loading .btn-text::after { content: '...'; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Plan strip on form */
+.plan-strip{background:var(--paper2);border-bottom:1px solid var(--paper3);padding:10px 44px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.plan-strip-lbl{font-family:var(--FM);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ash);margin-right:4px}
+.ps-btn{height:30px;padding:0 14px;border:1.5px solid var(--paper3);border-radius:2px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--ash);font-family:var(--FU);transition:all .15s}
+.ps-btn:hover{border-color:var(--amber);color:var(--amber)}
+.ps-btn.on{background:var(--void);color:var(--paper);border-color:var(--void)}
 
-  .submit-note { font-size: 13px; color: var(--muted); text-align: center; }
+/* Sector & example bar */
+.sector-bar{background:#fff;border-bottom:1px solid var(--paper2);padding:10px 44px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sector-bar label{font-size:12px;font-weight:600;color:var(--void)}
+.sector-bar select{height:34px;padding:0 10px;border:1.5px solid var(--paper3);border-radius:2px;font-size:12.5px;color:var(--void);background:var(--paper);font-family:var(--FU);cursor:pointer;min-width:220px}
+.sector-bar select:focus{outline:none;border-color:var(--amber)}
+.ex-btn{height:32px;padding:0 14px;background:transparent;border:1.5px solid var(--amber);color:var(--amber);border-radius:2px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--FU);transition:all .15s;display:flex;align-items:center;gap:6px}
+.ex-btn:hover{background:var(--amber);color:#fff}
 
-  /* FLASH */
-  .flash-msg {
-    margin-bottom: 24px;
-    padding: 14px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    border: 1.5px solid;
-  }
-  .flash-msg.error { background: #fef2f2; border-color: #fca5a5; color: var(--error); }
-  .flash-msg.success { background: #f0fdf4; border-color: #86efac; color: var(--success); }
+.flayout{max-width:820px;margin:0 auto;padding:26px 44px 120px}
+.fc{background:#fff;border-radius:var(--rl);border:1px solid var(--paper2);overflow:hidden;margin-bottom:12px;transition:border-color .18s;box-shadow:var(--e1)}
+.fc:focus-within{border-color:var(--amber)}
+.fch{padding:16px 20px;border-bottom:1px solid var(--paper2);display:flex;align-items:center;gap:12px}
+.sb{width:25px;height:25px;border-radius:50%;background:var(--void);color:var(--paper);font-family:var(--FM);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fct{font-size:14px;font-weight:600;color:var(--void)}.fcs{font-size:11px;color:var(--ash);margin-top:1px}
+.fcb{padding:18px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:11px}
+.g1{grid-template-columns:1fr;display:grid;gap:12px;margin-bottom:11px}
+@media(max-width:620px){.g2{grid-template-columns:1fr}}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:11.5px;font-weight:600;color:var(--void)}
+.fld label span{color:var(--ash);font-weight:400}
+input[type=text],input[type=email],input[type=tel],input[type=password],input[type=number],textarea,select{width:100%;height:40px;padding:0 12px;border:1px solid var(--paper3);border-radius:2px;font-size:13.5px;color:var(--void);background:var(--paper);outline:none;transition:all .15s;font-family:var(--FU);-webkit-appearance:none}
+input::placeholder,textarea::placeholder{color:var(--ash);opacity:.38}
+input:focus,textarea:focus,select:focus{background:#fff;border-color:var(--amber);box-shadow:0 0 0 3px rgba(160,104,32,.12)}
+textarea{height:auto;min-height:80px;padding:10px 12px;resize:vertical;line-height:1.55}
+select{cursor:pointer}
+.err-msg{font-size:11px;color:#c0392b;margin-top:2px;display:none}
+.fld.err input,.fld.err select,.fld.err textarea{border-color:#c0392b}
+.fld.err .err-msg{display:block}
 
-  /* FOOTER */
-  footer {
-    background: var(--ink);
-    color: rgba(250,249,247,0.5);
-    text-align: center;
-    padding: 30px;
-    font-size: 13px;
-    margin-top: 60px;
-  }
-  footer strong { color: var(--gold-light); }
+/* Photo upload */
+.pzone{border:1.5px dashed var(--paper3);border-radius:var(--rm);padding:22px;text-align:center;cursor:pointer;transition:all .16s;background:var(--paper)}
+.pzone:hover{border-color:var(--amber);background:var(--amberp)}
+.pzone-ic{font-size:22px;margin-bottom:6px}
+.pzone-lb{font-size:13px;font-weight:500;color:var(--void);margin-bottom:2px}
+.pzone-ht{font-size:11px;color:var(--ash)}
+.pprev{display:none;align-items:center;gap:12px;padding:11px;background:var(--paper);border-radius:var(--rm);border:1px solid var(--paper2)}
+.pprev img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(160,104,32,.25)}
+.pprev-rm{font-size:11px;padding:5px 11px;border:1px solid var(--paper3);border-radius:2px;background:#fff;cursor:pointer;transition:all .13s}
+.pprev-rm:hover{border-color:var(--ruby);color:var(--ruby)}
 
-  @media (max-width: 640px) {
-    .hero { padding: 50px 20px 40px; }
-    .form-section { padding: 40px 20px; }
-    .form-grid { grid-template-columns: 1fr; }
-    .template-cards { grid-template-columns: 1fr; }
-    .form-group.full { grid-column: 1; }
-  }
+/* Color swatches */
+.swrow{display:flex;gap:7px;flex-wrap:wrap}
+.sw{width:27px;height:27px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s}
+.sw:hover{transform:scale(1.12)}.sw.on{border-color:var(--void);transform:scale(1.18)}
+
+/* Font pills */
+.fps{display:flex;gap:7px;flex-wrap:wrap}
+.fp2{padding:6px 12px;border-radius:100px;border:1px solid var(--paper3);font-size:12px;background:#fff;cursor:pointer;transition:all .14s}
+.fp2:hover{border-color:var(--amber);background:var(--amberp)}
+.fp2.on{background:var(--void);color:var(--paper);border-color:var(--void)}
+
+/* Template grid */
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:7px}
+.tc{border:2px solid var(--paper2);border-radius:var(--rm);overflow:hidden;cursor:pointer;aspect-ratio:.707;transition:all .16s;position:relative}
+.tc:hover{border-color:var(--amberl);transform:translateY(-2px)}.tc.on{border-color:var(--amber);box-shadow:0 0 0 3px var(--amberp)}
+.tc-lb{position:absolute;bottom:0;inset-x:0;background:rgba(10,9,8,.7);color:var(--paper);font-size:8px;text-align:center;padding:3px;font-family:var(--FM)}
+
+/* Skills tags */
+.sk-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.sk-tag{padding:5px 11px;border-radius:100px;border:1.5px solid var(--paper3);font-size:11.5px;background:var(--paper);cursor:pointer;transition:all .14s;color:var(--ash)}
+.sk-tag:hover{border-color:var(--amber);color:var(--amber)}
+.sk-tag.on{background:var(--void);color:var(--paper);border-color:var(--void)}
+
+/* Dynamic items */
+.di{background:var(--paper);border:1px solid var(--paper2);border-radius:var(--rm);padding:16px;margin-bottom:10px;position:relative}
+.di-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.di-t{font-size:12.5px;font-weight:600;color:var(--void)}
+.di-rm{background:none;border:1px solid var(--paper3);border-radius:2px;font-size:12px;color:var(--ash);padding:3px 9px;cursor:pointer;transition:all .13s}
+.di-rm:hover{border-color:var(--ruby);color:var(--ruby);background:#fff5f5}
+.add-btn{width:100%;height:38px;background:transparent;border:1.5px dashed var(--paper3);border-radius:2px;font-size:13px;color:var(--amber);font-family:var(--FU);font-weight:600;cursor:pointer;transition:all .15s;margin-top:4px}
+.add-btn:hover{border-color:var(--amber);background:var(--amberp)}
+
+/* Skill level */
+.sk-lvl{display:flex;gap:4px;margin-top:6px}
+.sk-dot{width:10px;height:10px;border-radius:50%;background:var(--paper3);cursor:pointer;transition:all .13s}
+.sk-dot.on{background:var(--amber)}
+
+/* AI rewrite */
+.ai-row{display:flex;align-items:center;gap:10px;margin-top:8px}
+.ai-btn{height:34px;padding:0 16px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--FU);transition:all .15s;display:flex;align-items:center;gap:7px}
+.ai-btn:hover{background:var(--amber);color:#fff}
+.ai-spin{width:14px;height:14px;border:2px solid rgba(247,244,238,.3);border-top-color:var(--amberl);border-radius:50%;animation:spin 1s linear infinite;display:none}
+.ai-txt{font-size:11.5px;color:var(--ash)}
+
+/* Generate button */
+.gz{margin-top:24px;padding:20px;background:#fff;border:1px solid var(--paper2);border-radius:var(--rl);text-align:center}
+.gen-btn{height:52px;padding:0 40px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:15px;font-weight:600;font-family:var(--FU);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:10px}
+.gen-btn:hover{background:var(--amber);transform:translateY(-2px);box-shadow:var(--e2)}
+.gen-ht{font-size:11.5px;color:var(--ash);margin-top:10px}
+
+/* Sticky mobile pay */
+.sticky-pay{position:fixed;bottom:0;left:0;right:0;z-index:300;background:white;border-top:1px solid var(--paper2);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+@media(max-width:768px){.sticky-pay{display:flex}}
+.sticky-pay-info{font-size:13px;font-weight:600}
+.sticky-pay-btn{height:38px;padding:0 20px;background:var(--amber);color:#fff;border:none;border-radius:2px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--FU)}
+
+/* ═══ PREVIEW PAGE ═══ */
+.pvpage{padding-top:58px;background:var(--paper);min-height:100vh}
+.pvtb{position:sticky;top:58px;z-index:100;background:rgba(247,244,238,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--mist);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.pvtb-l{display:flex;align-items:center;gap:12px}
+.pvtb-bk{height:32px;padding:0 14px;background:transparent;border:1px solid var(--paper3);border-radius:2px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--FU);color:var(--void);transition:all .14s}
+.pvtb-bk:hover{border-color:var(--amber);color:var(--amber)}
+.pvtb-dv{width:1px;height:18px;background:var(--paper3)}
+.pvtb-lb{font-size:12.5px;font-weight:600;color:var(--ash)}
+.pvtb-r{display:flex;align-items:center;gap:12px}
+.pay-pill{height:34px;padding:0 18px;background:var(--forest);color:#fff;border:none;border-radius:2px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--FU);transition:all .15s;display:flex;align-items:center;gap:7px}
+.pay-pill:hover{background:var(--amber);transform:translateY(-1px)}
+.timer-p{display:flex;align-items:center;gap:7px;font-family:var(--FM);font-size:12px;color:var(--ash)}
+.tpulse{width:7px;height:7px;border-radius:50%;background:#e74c3c;animation:aSP 1.4s ease-in-out infinite}
+.tdig{font-weight:500;color:var(--void)}
+.pv-stage{padding:32px 0 60px;text-align:center;background:var(--paper)}
+.pv-paper{display:inline-block;box-shadow:var(--e3);border-radius:3px;overflow:hidden;transition:filter .4s}
+.pv-paper.blurred{filter:blur(8px);pointer-events:none}
+.blur-gate{display:none;position:absolute;inset:0;background:rgba(10,9,8,.72);border-radius:3px;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:40px}
+.blur-gate.show{display:flex}
+.bg-lock{font-size:40px}
+.bg-title{font-size:18px;font-weight:700;color:var(--paper);font-family:var(--FD)}
+.bg-text{font-size:13px;color:rgba(247,244,238,.6);text-align:center;max-width:300px;line-height:1.6}
+.bg-btn{height:44px;padding:0 28px;background:var(--amber);color:var(--void);border:none;border-radius:2px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--FU);margin-top:6px;transition:all .17s}
+.bg-btn:hover{background:var(--amberl)}
+
+/* Order sidebar on preview */
+.pv-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;max-width:1200px;margin:0 auto;padding:28px 28px 60px;align-items:start}
+@media(max-width:900px){.pv-layout{grid-template-columns:1fr;}}
+.order-box{background:#fff;border:1px solid var(--paper2);border-radius:var(--rl);padding:22px;position:sticky;top:120px}
+.order-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--paper2)}
+.order-row:last-of-type{border-bottom:none}
+.order-row strong{font-family:var(--FD);font-size:20px;color:var(--amber)}
+.order-methods{background:var(--amberp);border-radius:var(--rm);padding:10px 12px;font-size:11.5px;color:var(--ash);margin:12px 0;line-height:1.7}
+.order-pay-btn{width:100%;height:46px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--FU);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+.order-pay-btn:hover{background:var(--amber);transform:translateY(-1px);box-shadow:var(--e2)}
+.order-back{width:100%;height:36px;background:transparent;border:1px solid var(--paper3);color:var(--ash);border-radius:2px;font-size:12.5px;cursor:pointer;font-family:var(--FU);margin-top:8px;transition:all .14s}
+.order-back:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ═══ SUCCESS PAGE ═══ */
+.success-page{padding-top:58px;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding-left:24px;padding-right:24px;background:var(--paper)}
+.success-ic{font-size:64px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);margin-bottom:20px}
+.success-page h1{font-family:var(--FD);font-size:clamp(28px,4vw,42px);margin-bottom:12px;letter-spacing:-.5px}
+.success-page p{color:var(--ash);max-width:440px;font-size:14px;line-height:1.7;margin-bottom:28px}
+.dl-btn-main{height:52px;padding:0 36px;background:var(--forest);color:#fff;border:none;border-radius:2px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--FU);transition:all .2s;display:inline-flex;align-items:center;gap:10px}
+.dl-btn-main:hover{background:var(--amber);transform:translateY(-2px);box-shadow:var(--e2)}
+.dl-note{font-size:11.5px;color:var(--ash);margin-top:10px;margin-bottom:28px}
+.upsell-c{background:#fff;border:1px solid var(--paper2);border-radius:var(--rl);padding:20px 24px;max-width:440px;width:100%;text-align:left;margin-top:4px}
+.upsell-c h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.upsell-c p{font-size:12.5px;color:var(--ash);margin-bottom:14px;line-height:1.6}
+.upsell-wa{height:40px;padding:0 20px;background:#25D366;color:#fff;border:none;border-radius:2px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--FU);display:flex;align-items:center;gap:8px;transition:all .15s}
+.upsell-wa:hover{background:#1ab558}
+
+/* ═══ ADMIN ═══ */
+.adm-page{padding-top:58px;min-height:100vh;background:var(--paper)}
+.adm-login{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:24px}
+.adm-login-box{background:#fff;border:1px solid var(--paper2);border-radius:var(--rl);padding:36px;width:100%;max-width:380px;box-shadow:var(--e2);text-align:center}
+.adm-login-box h2{font-family:var(--FD);font-size:22px;margin-bottom:6px}
+.adm-login-box p{font-size:13px;color:var(--ash);margin-bottom:22px}
+.adm-login-input{height:42px;padding:0 13px;border:1.5px solid var(--paper3);border-radius:2px;font-size:14px;width:100%;margin-bottom:10px;font-family:var(--FU);color:var(--void);background:var(--paper)}
+.adm-login-input:focus{outline:none;border-color:var(--amber);background:#fff}
+.adm-login-btn{width:100%;height:44px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--FU);margin-top:4px;transition:all .17s}
+.adm-login-btn:hover{background:var(--amber)}
+.adm-err{color:var(--ruby);font-size:12px;margin-top:10px;display:none}
+.adm-layout{display:flex;min-height:calc(100vh - 58px)}
+.adm-sb{width:220px;background:var(--void2);flex-shrink:0;padding:16px 0;display:flex;flex-direction:column}
+.adm-sb-hd{padding:8px 20px 16px;border-bottom:1px solid rgba(247,244,238,.06);margin-bottom:8px}
+.adm-sb-hd-t{font-family:var(--FD);font-size:15px;color:var(--paper);font-weight:700}
+.adm-sb-hd-s{font-size:11px;color:rgba(247,244,238,.3);margin-top:2px}
+.adm-nav{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:rgba(247,244,238,.55);transition:all .15s}
+.adm-nav:hover,.adm-nav.on{background:rgba(247,244,238,.06);color:var(--paper)}
+.adm-nav.on{border-left:3px solid var(--amberl)}
+.adm-nav-ic{font-size:14px}
+.adm-lo{margin-top:auto;padding:14px 20px}
+.adm-lo-btn{width:100%;height:34px;background:rgba(247,244,238,.05);border:1px solid rgba(247,244,238,.1);color:rgba(247,244,238,.5);border-radius:2px;font-size:12px;cursor:pointer;font-family:var(--FU);transition:all .13s}
+.adm-lo-btn:hover{background:rgba(98,20,40,.3);color:rgba(247,244,238,.8);border-color:var(--ruby)}
+.adm-main{flex:1;padding:28px 32px;overflow-y:auto;max-height:calc(100vh - 58px)}
+.adm-tab{display:none}.adm-tab.active{display:block}
+.adm-pt{font-family:var(--FD);font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.adm-ps{font-size:12.5px;color:var(--ash);margin-bottom:22px}
+.guide-box{background:rgba(30,92,58,.07);border:1px solid rgba(30,92,58,.2);border-radius:var(--rm);padding:14px 18px;font-size:12.5px;color:var(--ash);margin-bottom:20px;line-height:1.7}
+.guide-box b{color:var(--forest)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:#fff;border-radius:var(--rm);padding:18px 18px 14px;border:1px solid var(--paper2);border-left:3px solid var(--paper3)}
+.kpi.g{border-left-color:var(--forest)}.kpi.b{border-left-color:var(--ocean)}.kpi.a{border-left-color:var(--amber)}.kpi.r{border-left-color:var(--ruby)}
+.kpi-lb{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ash);margin-bottom:6px}
+.kpi-v{font-family:var(--FD);font-size:26px;font-weight:700;color:var(--void);line-height:1}
+.kpi-s{font-size:11px;color:var(--ash);margin-top:5px}.ku{color:var(--forest);font-weight:600}
+.ch-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.ch-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.ch{background:#fff;border-radius:var(--rm);border:1px solid var(--paper2);padding:18px}
+.ch-t{font-size:13px;font-weight:700;margin-bottom:2px}
+.ch-s{font-size:11px;color:var(--ash);margin-bottom:14px}
+.ch-wrap{position:relative;height:160px}
+.tcard{background:#fff;border-radius:var(--rm);border:1px solid var(--paper2);overflow:hidden}
+.tcard-hd{padding:14px 18px;border-bottom:1px solid var(--paper2);display:flex;justify-content:space-between;align-items:center}
+.tcard-t{font-size:13px;font-weight:700}
+.tcard-count{font-family:var(--FM);font-size:11px;color:var(--ash)}
+.ttb{width:100%;border-collapse:collapse;font-size:12.5px}
+.ttb th{padding:10px 14px;text-align:left;background:var(--paper);border-bottom:1px solid var(--paper3);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ash)}
+.ttb td{padding:10px 14px;border-bottom:1px solid var(--paper2);color:var(--void)}
+.ttb tr:last-child td{border:none}
+.ttb tr:hover td{background:var(--ghost)}
+.badge{display:inline-block;padding:3px 9px;border-radius:100px;font-size:10.5px;font-weight:600}
+.bOK{background:rgba(30,92,58,.1);color:var(--forest)}
+.bPN{background:rgba(160,104,32,.1);color:var(--amber)}
+.bRJ{background:rgba(98,20,40,.1);color:var(--ruby)}
+.bWA{background:rgba(24,56,104,.1);color:var(--ocean)}
+.sg{background:#fff;border:1px solid var(--paper2);border-radius:var(--rm);padding:18px;margin-bottom:14px}
+.sg-t{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ash);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--paper2)}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--ghost);gap:16px}
+.sr:last-child{border:none}
+.sr-lb{font-size:13px;font-weight:600;color:var(--void)}
+.sr-s{font-size:11px;color:var(--ash);margin-top:2px}
+.tog{position:relative;display:inline-block;width:42px;height:22px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-tr{position:absolute;inset:0;background:var(--paper3);border-radius:11px;transition:.3s}
+.tog input:checked~.tog-tr{background:var(--forest)}
+.tog-th{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.3s;box-shadow:var(--e1)}
+.tog input:checked~.tog-tr~.tog-th,.tog input:checked+.tog-tr+.tog-th{left:22px}
+.gp-row{display:flex;gap:7px;flex-wrap:wrap}
+.gp{width:27px;height:27px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s}
+.gp:hover{transform:scale(1.12)}.gp.on{border-color:var(--paper);transform:scale(1.18)}
+
+/* PAYMENT MODAL */
+.mveil{position:fixed;inset:0;z-index:900;background:rgba(10,9,8,.7);display:flex;align-items:center;justify-content:center;padding:20px;display:none}
+.mveil.open{display:flex}
+.pmbox{background:#fff;border-radius:var(--rl);width:100%;max-width:400px;overflow:hidden;box-shadow:var(--e3);animation:popIn .3s cubic-bezier(.34,1.4,.64,1)}
+.pm-hd{background:var(--void);padding:20px 22px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.pm-ic{font-size:28px;margin-bottom:4px}
+.pm-title{font-family:var(--FD);font-size:18px;color:var(--paper);font-weight:700}
+.pm-sub{font-size:12px;color:rgba(247,244,238,.5)}
+.pm-body{padding:22px}
+.price-box{background:var(--amberp);border:1px solid rgba(160,104,32,.25);border-radius:var(--rm);padding:14px 18px;text-align:center;margin-bottom:16px}
+.price-lbl{font-family:var(--FM);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+.price-val{display:flex;align-items:baseline;gap:4px;justify-content:center}
+.price-cur{font-size:13px;color:var(--amber);font-weight:600}
+.price-big{font-family:var(--FD);font-size:36px;font-weight:700;color:var(--void);letter-spacing:-1px}
+.pm-feats{list-style:none;margin-bottom:16px}
+.pm-fi{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px;color:var(--ash);border-bottom:1px solid var(--ghost)}
+.pm-fi:last-child{border:none}
+.pm-fc{color:var(--forest);font-weight:700;font-size:13px}
+.pay-now-btn{width:100%;height:46px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--FU);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.pay-now-btn:hover{background:var(--amber);transform:translateY(-1px)}
+.pay-note{font-family:var(--FM);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ash);text-align:center;margin-top:11px}
+.pay-wait{display:none;text-align:center;padding:10px 0}
+.pay-wait.show{display:block}
+.pay-spinner{width:40px;height:40px;border:3px solid var(--paper3);border-top-color:var(--amber);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+.pay-wait-t{font-size:14px;font-weight:600;margin-bottom:6px}
+.pay-wait-s{font-size:12px;color:var(--ash);line-height:1.6;margin-bottom:16px}
+.pay-timer-bar{height:3px;background:var(--paper3);border-radius:2px;margin:10px 0}
+.pay-timer-fill{height:100%;background:var(--amber);border-radius:2px;transition:width 1s linear}
+.pay-man-btn{height:36px;padding:0 18px;background:transparent;border:1.5px solid var(--paper3);border-radius:2px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--FU);color:var(--ash);transition:all .14s}
+.pay-man-btn:hover{border-color:var(--forest);color:var(--forest)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;background:var(--void);color:var(--paper);padding:10px 20px;border-radius:2px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══ CV TEMPLATES CSS ═══ */
+/* SIMPLE */
+.cv-simple{background:#fff;font-family:Georgia,serif;width:794px;min-height:1123px;position:relative}
+.cvs-wrap{padding:36px 40px}
+.cvs-hd{display:flex;align-items:center;gap:18px;padding-bottom:16px;border-bottom:2.5px solid #111;margin-bottom:18px}
+.cvs-avph{width:62px;height:62px;border-radius:50%;background:#e0e0e0;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#888;flex-shrink:0;overflow:hidden}
+.cvs-avph img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.cvs-name{font-size:22px;font-weight:700;letter-spacing:-.3px;text-transform:uppercase;letter-spacing:2px}
+.cvs-title{font-size:12px;color:#555;margin-top:2px;font-style:italic}
+.cvs-contacts{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:6px;font-size:10px;color:#666}
+.cvs-sec{margin-bottom:14px}
+.cvs-sh{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#333;border-bottom:1px solid #ccc;padding-bottom:3px;margin-bottom:8px}
+.cvs-sum{font-size:11px;color:#444;line-height:1.6}
+.cvs-item{margin-bottom:9px}
+.cvs-item-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1px}
+.cvs-item-t{font-size:11.5px;font-weight:700}
+.cvs-item-d{font-size:10px;color:#888}
+.cvs-item-s{font-size:10.5px;color:#666;font-style:italic;margin-bottom:2px}
+.cvs-item-desc{font-size:10px;color:#555;line-height:1.55}
+.cvs-2col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cvs-tags{display:flex;flex-wrap:wrap;gap:4px}
+.cvs-tag{font-size:9.5px;padding:2px 8px;background:#f2f2f2;border:1px solid #ddd;border-radius:1px}
+
+/* PRO — color var driven */
+.cv-pro{background:#fff;width:794px;min-height:1123px;display:flex}
+.pro-sb{width:220px;flex-shrink:0;padding:24px 16px;display:flex;flex-direction:column;gap:14px}
+.pro-sb-avph{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin:0 auto 4px;flex-shrink:0;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);overflow:hidden}
+.pro-sb-avph img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pro-sb-name{text-align:center;font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.pro-sb-title{text-align:center;font-size:9.5px;color:rgba(255,255,255,.6);margin-top:2px}
+.pro-sb-sec{margin-top:10px}
+.pro-sb-sh{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.45);padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:7px}
+.pro-sb-it{display:flex;align-items:flex-start;gap:6px;font-size:9.5px;color:rgba(255,255,255,.75);margin-bottom:4px;line-height:1.4}
+.pro-sb-ic{font-size:9px;opacity:.5;flex-shrink:0;margin-top:1px}
+.pro-sk-it{margin-bottom:5px}
+.pro-sk-n{font-size:9px;color:rgba(255,255,255,.7);margin-bottom:2px}
+.pro-sk-bg{height:3px;background:rgba(255,255,255,.15);border-radius:2px}
+.pro-sk-f{height:100%;background:rgba(255,255,255,.65);border-radius:2px}
+.pro-main{flex:1;padding:24px 22px;overflow:hidden}
+.pro-hd{margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid}
+.pro-hd-n{font-size:22px;font-weight:700;letter-spacing:-.3px;font-family:Georgia,serif}
+.pro-hd-t{font-size:11.5px;margin-top:3px;opacity:.6}
+.pro-body{display:flex;flex-direction:column;gap:12px}
+.pro-sec{}
+.pro-sec-h{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;padding-bottom:4px;border-bottom:1.5px solid;margin-bottom:8px;opacity:.8}
+.pro-sum{font-size:10.5px;color:#444;line-height:1.6}
+.pro-it{margin-bottom:9px}
+.pro-it-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1px}
+.pro-it-t{font-size:11px;font-weight:700}
+.pro-it-d{font-size:9.5px;color:#888}
+.pro-it-s{font-size:10px;font-style:italic;color:#666;margin-bottom:2px}
+.pro-it-desc{font-size:10px;color:#555;line-height:1.55}
+/* Pro color themes */
+.cv-pro.T1 .pro-sb{background:#183868}.cv-pro.T1 .pro-hd{border-color:#183868}.cv-pro.T1 .pro-sec-h{border-color:#183868;color:#183868}
+.cv-pro.T2 .pro-sb{background:#1E5C3A}.cv-pro.T2 .pro-hd{border-color:#1E5C3A}.cv-pro.T2 .pro-sec-h{border-color:#1E5C3A;color:#1E5C3A}
+.cv-pro.T3 .pro-sb{background:#621428}.cv-pro.T3 .pro-hd{border-color:#621428}.cv-pro.T3 .pro-sec-h{border-color:#621428;color:#621428}
+.cv-pro.T4 .pro-sb{background:#1A1915}.cv-pro.T4 .pro-hd{border-color:#333}.cv-pro.T4 .pro-sec-h{border-color:#333;color:#333}
+.cv-pro.T5 .pro-sb{background:#2C3E50}.cv-pro.T5 .pro-hd{border-color:#2C3E50}.cv-pro.T5 .pro-sec-h{border-color:#2C3E50;color:#2C3E50}
+/* Pro lang */
+.pro-lang-it{display:flex;justify-content:space-between;font-size:9.5px;color:rgba(255,255,255,.7);margin-bottom:3px}
+.pro-lang-it span:last-child{opacity:.5}
+
+/* PREMIUM */
+.cv-prem{background:#fff;width:794px;min-height:1123px;display:flex}
+.prem-sb{width:230px;flex-shrink:0;padding:28px 16px;display:flex;flex-direction:column;gap:14px}
+.prem-av-ph{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:rgba(255,255,255,.85);margin:0 auto 8px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.25)}
+.prem-av-rnd{width:80px;height:80px;border-radius:50%;display:block;margin:0 auto 8px;object-fit:cover;border:2px solid rgba(255,255,255,.25)}
+.prem-av-hex{width:80px;height:80px;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:block;margin:0 auto 8px;object-fit:cover}
+.prem-sb-sec{margin-top:8px}
+.prem-sb-sh{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,.35);padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:7px}
+.prem-sb-it{display:flex;align-items:flex-start;gap:6px;font-size:9px;color:rgba(255,255,255,.65);margin-bottom:4px;line-height:1.4}
+.prem-sb-ic{font-size:8.5px;opacity:.4;flex-shrink:0;margin-top:1px}
+.prem-sk-it{margin-bottom:5px}
+.prem-sk-n{font-size:8.5px;color:rgba(255,255,255,.65);margin-bottom:2px}
+.prem-sk-bg{height:2.5px;background:rgba(255,255,255,.1);border-radius:2px}
+.prem-sk-f{height:100%;border-radius:2px}
+.prem-main{flex:1;padding:0;overflow:hidden;display:flex;flex-direction:column}
+.prem-hd{padding:22px 22px 16px}
+.prem-hd-n{font-size:22px;font-weight:700;letter-spacing:-.3px;color:#fff;line-height:1.1}
+.prem-hd-t{font-size:11px;margin-top:4px;color:rgba(255,255,255,.55);font-style:italic}
+.prem-body{background:#fff;flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:12px}
+.prem-sec{}
+.prem-sec-h{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:1.5px solid rgba(0,0,0,.08);color:#777}
+.prem-it{margin-bottom:9px}
+.prem-it-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1px}
+.prem-it-t{font-size:11.5px;font-weight:700;color:#111}
+.prem-it-d{font-size:9.5px;color:#999}
+.prem-it-s{font-size:10px;font-style:italic;color:#666;margin-bottom:2px}
+.prem-it-desc{font-size:10px;color:#555;line-height:1.55}
+.prem-tags{display:flex;flex-wrap:wrap;gap:4px}
+.prem-tag{font-size:9.5px;padding:3px 9px;border-radius:100px;background:rgba(0,0,0,.06);color:#555}
+/* Premium palettes — sidebar BG + accent gradient */
+.cv-prem.P1 .prem-sb{background:#0D1520}.cv-prem.P1 .prem-hd{background:#162038}.cv-prem.P1 .prem-sk-f{background:linear-gradient(90deg,#C49438,#7A4E0E)}
+.cv-prem.P2 .prem-sb{background:#0A1A12}.cv-prem.P2 .prem-hd{background:#0A2E1A}.cv-prem.P2 .prem-sk-f{background:linear-gradient(90deg,#30885C,#08401E)}
+.cv-prem.P3 .prem-sb{background:#140608}.cv-prem.P3 .prem-hd{background:#26080C}.cv-prem.P3 .prem-sk-f{background:linear-gradient(90deg,#B42C3A,#680A14)}
+.cv-prem.P4 .prem-sb{background:#0C0C0E}.cv-prem.P4 .prem-hd{background:#181820}.cv-prem.P4 .prem-sk-f{background:linear-gradient(90deg,#C8C8E8,#606080)}
+.cv-prem.P5 .prem-sb{background:#1A1208}.cv-prem.P5 .prem-hd{background:#2E1E0C}.cv-prem.P5 .prem-sk-f{background:linear-gradient(90deg,#C87818,#7A4206)}
+.cv-prem.P6 .prem-sb{background:#081420}.cv-prem.P6 .prem-hd{background:#0C263C}.cv-prem.P6 .prem-sk-f{background:linear-gradient(90deg,#248ABC,#083C5C)}
+.cv-prem.P7 .prem-sb{background:#10101C}.cv-prem.P7 .prem-hd{background:#1C1630}.cv-prem.P7 .prem-sk-f{background:linear-gradient(90deg,#7E4CCC,#361070)}
+.cv-prem.P8 .prem-sb{background:#101418}.cv-prem.P8 .prem-hd{background:#162028}.cv-prem.P8 .prem-sk-f{background:linear-gradient(90deg,#388CA2,#103C50)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .nav,.fhero,.ft{padding-left:20px;padding-right:20px}
+  .hero,.sec{padding-left:20px;padding-right:20px}
+  .flayout{padding-left:16px;padding-right:16px}
+  .plan-strip,.sector-bar{padding-left:16px;padding-right:16px}
+  .ex-grid,.pl-grid,.steps-row{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .ch-grid,.ch-grid2{grid-template-columns:1fr}
+  .adm-layout{flex-direction:column}
+  .adm-sb{width:100%;flex-direction:row;flex-wrap:wrap;padding:8px}
+  .adm-main{padding:18px 14px}
+  .pv-layout{grid-template-columns:1fr;padding:16px}
+}
 </style>
 </head>
 <body>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo" onclick="goHome()">
+    <div class="nav-em">CV</div>
+    <span class="nav-wm">CV<em>Craft</em></span>
+  </div>
+  <div class="nav-r">
+    <button class="nb nb-lang" id="lang-btn" onclick="toggleLang()">EN</button>
+    <button class="nb nb-g" onclick="goHome()" data-i18n="nav_home">Accueil</button>
+    <button class="nb nb-s" onclick="selectPlan('pro')" data-i18n="nav_create">Créer mon CV</button>
+    <button class="nb nb-am" onclick="showPage('page-admin')">⚙ Admin</button>
+  </div>
+</nav>
 
-<section class="hero">
-  <div class="hero-badge">✦ Création de CV Professionnelle</div>
-  <h1>Votre CV,<br><em>élevé au rang d'art</em></h1>
-  <p>Remplissez le formulaire ci-dessous et obtenez un CV élégant et professionnel en quelques secondes.</p>
-  <a href="#formulaire" class="hero-scroll">Commencer maintenant</a>
-</section>
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/22898489984?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20pour%20mon%20CV%20CVCraft" target="_blank" class="wa-float" title="Support WhatsApp">💬</a>
 
-<div class="templates-bar">
-  <span>Templates :</span>
-  <div class="tpl-pill active"><span class="dot dot-simple"></span> Simple</div>
-  <div class="tpl-pill"><span class="dot dot-pro"></span> Professionnel</div>
-  <div class="tpl-pill"><span class="dot dot-premium"></span> Premium</div>
-</div>
+<!-- ═══════════ HOME ═══════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-ey" data-i18n="hero_badge">Générateur de CV — Afrique de l'Ouest</div>
+    <h1 class="hh" data-i18n="hero_title">Votre carrière,<em> sublimée.</em></h1>
+    <p class="hero-sub" data-i18n="hero_sub">CV professionnel adapté au marché africain · Paiement mobile money · PDF instantané dès 1 000 FCFA</p>
+    <div class="hero-btns">
+      <button class="cA" onclick="document.getElementById('ex-anchor').scrollIntoView({behavior:'smooth'})" data-i18n="hero_cta1">Voir les exemples ↓</button>
+      <button class="cB" onclick="document.getElementById('plans-anchor').scrollIntoView({behavior:'smooth'})" data-i18n="hero_cta2">Choisir ma formule</button>
+    </div>
+    <div class="hero-sc"><div class="hero-sc-l"></div><span>DÉFILER</span></div>
+  </div>
 
-<section class="form-section" id="formulaire">
+  <div class="mq"><div class="mq-t">
+    <span class="mq-i">✦ CV Simple <b>1 000 FCFA</b></span>
+    <span class="mq-i">✦ CV Professionnel <b>1 500 FCFA</b></span>
+    <span class="mq-i">✦ CV Premium <b>3 000 FCFA</b></span>
+    <span class="mq-i">✦ Paiement <b>Wave · MoMo · OPay · Orange Money</b></span>
+    <span class="mq-i">✦ Reformulation <b>IA automatique</b></span>
+    <span class="mq-i">✦ PDF <b>immédiat</b></span>
+    <span class="mq-i">✦ CV Simple <b>1 000 FCFA</b></span>
+    <span class="mq-i">✦ CV Professionnel <b>1 500 FCFA</b></span>
+    <span class="mq-i">✦ CV Premium <b>3 000 FCFA</b></span>
+    <span class="mq-i">✦ Paiement <b>Wave · MoMo · OPay · Orange Money</b></span>
+    <span class="mq-i">✦ Reformulation <b>IA automatique</b></span>
+    <span class="mq-i">✦ PDF <b>immédiat</b></span>
+  </div></div>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-      <div class="flash-msg {{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endwith %}
+  <!-- HOW IT WORKS -->
+  <div class="sec">
+    <div class="stag" data-i18n="how_tag">Comment ça marche</div>
+    <h2 class="sh2">Trois étapes,<em> un CV parfait</em></h2>
+    <div class="steps-row">
+      <div class="step-c">
+        <div class="step-num">01</div>
+        <h3 data-i18n="step1_t">Remplis le formulaire</h3>
+        <p data-i18n="step1_d">Saisis tes informations, ton parcours et tes compétences. L'aperçu se met à jour en temps réel.</p>
+      </div>
+      <div class="step-c">
+        <div class="step-num">02</div>
+        <h3 data-i18n="step2_t">Choisis ton plan</h3>
+        <p data-i18n="step2_d">Simple, Professionnel ou Premium. Paie en toute sécurité via Wave, MoMo, OPay, Orange Money ou T-Money.</p>
+      </div>
+      <div class="step-c">
+        <div class="step-num">03</div>
+        <h3 data-i18n="step3_t">Télécharge ton PDF</h3>
+        <p data-i18n="step3_d">Dès confirmation du paiement, télécharge immédiatement ton CV en PDF professionnel haute qualité.</p>
+      </div>
+    </div>
+  </div>
 
-  <h2 class="section-title">Vos informations</h2>
-  <p class="section-subtitle">Tous les champs marqués d'un <span style="color:var(--gold)">✦</span> sont obligatoires.</p>
+  <!-- EXAMPLES -->
+  <div id="ex-anchor" class="sec" style="padding-top:0">
+    <div class="stag">Exemples de CV</div>
+    <h2 class="sh2">Trois niveaux,<em> trois styles</em></h2>
+    <p style="font-size:15px;color:var(--ash);margin-bottom:44px;max-width:460px;line-height:1.7;font-weight:300">Chaque exemple illustre les différences visuelles et fonctionnelles entre les formules.</p>
+    <div class="ex-grid">
+      <!-- Simple -->
+      <div class="ex-card" style="position:relative" onclick="selectPlan('simple')">
+        <div class="ex-lbl">Simple</div><div class="ex-price">1 000 FCFA</div>
+        <div class="ex-cv-zone"><div class="ex-scale">
+          <div class="cv-simple"><div class="cvs-wrap">
+            <div class="cvs-hd">
+              <div class="cvs-avph">AM</div>
+              <div class="cvs-info" style="flex:1">
+                <div class="cvs-name">Aminata Mensah</div>
+                <div class="cvs-title">Responsable Comptable Senior</div>
+                <div class="cvs-contacts"><span>✉ aminata@email.com</span><span>☏ +226 70 00 00 00</span><span>⌖ Ouagadougou</span></div>
+              </div>
+            </div>
+            <div class="cvs-sec"><div class="cvs-sh">Profil Professionnel</div><div class="cvs-sum">Comptable certifiée OHADA avec 9 ans d'expérience en gestion financière, audit interne et reporting pour des entreprises des secteurs minier et agro-industriel en Afrique de l'Ouest.</div></div>
+            <div class="cvs-sec"><div class="cvs-sh">Expérience Professionnelle</div>
+              <div class="cvs-item"><div class="cvs-item-hd"><span class="cvs-item-t">Responsable Comptable</span><span class="cvs-item-d">2020 — Présent</span></div><div class="cvs-item-s">SAPHIRA Mining SA — Ouagadougou</div><div class="cvs-item-desc">Supervision d'une équipe de 8 comptables. Pilotage des clôtures mensuelles. Reporting IFRS aux actionnaires internationaux.</div></div>
+            </div>
+            <div class="cvs-2col">
+              <div class="cvs-sec"><div class="cvs-sh">Formation</div><div class="cvs-item"><div class="cvs-item-hd"><span class="cvs-item-t">DESCF — Expertise Comptable</span><span class="cvs-item-d">2017</span></div><div class="cvs-item-s">ISCB Ouagadougou · Major de promo</div></div></div>
+              <div class="cvs-sec"><div class="cvs-sh">Compétences</div><div class="cvs-tags"><span class="cvs-tag">SAP FICO</span><span class="cvs-tag">OHADA</span><span class="cvs-tag">IFRS</span><span class="cvs-tag">Excel</span><span class="cvs-tag">Audit</span></div></div>
+            </div>
+          </div></div>
+        </div></div>
+        <div class="ex-footer"><span>CV Simple — Comptable</span><button onclick="event.stopPropagation();selectPlan('simple')">Créer →</button></div>
+      </div>
+      <!-- Pro -->
+      <div class="ex-card" style="position:relative" onclick="selectPlan('pro')">
+        <div class="ex-lbl">Professionnel</div><div class="ex-price">1 500 FCFA</div>
+        <div class="ex-cv-zone"><div class="ex-scale">
+          <div class="cv-pro T1">
+            <div class="pro-sb">
+              <div class="pro-sb-avph">SK</div>
+              <div class="pro-sb-name">Sophie Kouamé</div>
+              <div class="pro-sb-title">Directrice Marketing Digital</div>
+              <div class="pro-sb-sec"><div class="pro-sb-sh">Contact</div>
+                <div class="pro-sb-it"><span class="pro-sb-ic">✉</span>sophie@mtn.ci</div>
+                <div class="pro-sb-it"><span class="pro-sb-ic">☏</span>+225 07 00 00 00</div>
+                <div class="pro-sb-it"><span class="pro-sb-ic">⌖</span>Abidjan, Côte d'Ivoire</div>
+              </div>
+              <div class="pro-sb-sec"><div class="pro-sb-sh">Compétences</div>
+                <div class="pro-sk-it"><div class="pro-sk-n">Digital Marketing</div><div class="pro-sk-bg"><div class="pro-sk-f" style="width:88%"></div></div></div>
+                <div class="pro-sk-it"><div class="pro-sk-n">SEO / SEM</div><div class="pro-sk-bg"><div class="pro-sk-f" style="width:75%"></div></div></div>
+                <div class="pro-sk-it"><div class="pro-sk-n">Analytics</div><div class="pro-sk-bg"><div class="pro-sk-f" style="width:82%"></div></div></div>
+              </div>
+            </div>
+            <div class="pro-main">
+              <div class="pro-hd" style="border-color:#183868"><div class="pro-hd-n">Sophie Kouamé</div><div class="pro-hd-t">Directrice Marketing Digital</div></div>
+              <div class="pro-body">
+                <div class="pro-sec"><div class="pro-sec-h" style="border-color:#183868;color:#183868">Profil</div><div class="pro-sum">Directrice Marketing avec 10 ans d'expérience en stratégie digitale pour des marques panafricaines. Spécialiste de la croissance organique et des campagnes d'acquisition multicanales.</div></div>
+                <div class="pro-sec"><div class="pro-sec-h" style="border-color:#183868;color:#183868">Expérience</div>
+                  <div class="pro-it"><div class="pro-it-hd"><span class="pro-it-t">Directrice Marketing</span><span class="pro-it-d">2021 — Présent</span></div><div class="pro-it-s">MTN Côte d'Ivoire — Abidjan</div><div class="pro-it-desc">Budget marketing 2,4 Mds FCFA. +38% acquisition digitale en 18 mois.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ex-footer"><span>CV Pro — Marketing</span><button onclick="event.stopPropagation();selectPlan('pro')">Créer →</button></div>
+      </div>
+      <!-- Premium -->
+      <div class="ex-card" style="position:relative" onclick="selectPlan('premium')">
+        <div class="ex-lbl">Premium</div><div class="ex-price">3 000 FCFA</div>
+        <div class="ex-cv-zone"><div class="ex-scale">
+          <div class="cv-prem P1">
+            <div class="prem-sb">
+              <div class="prem-av-ph">KA</div>
+              <div class="prem-sb-sec"><div class="prem-sb-sh">Contact</div>
+                <div class="prem-sb-it"><span class="prem-sb-ic">✉</span>kofi@ecobank.com</div>
+                <div class="prem-sb-it"><span class="prem-sb-ic">☏</span>+233 20 000 0000</div>
+                <div class="prem-sb-it"><span class="prem-sb-ic">⌖</span>Accra, Ghana</div>
+              </div>
+              <div class="prem-sb-sec"><div class="prem-sb-sh">Compétences</div>
+                <div class="prem-sk-it"><div class="prem-sk-n">Finance Stratégique</div><div class="prem-sk-bg"><div class="prem-sk-f" style="width:90%"></div></div></div>
+                <div class="prem-sk-it"><div class="prem-sk-n">M&amp;A</div><div class="prem-sk-bg"><div class="prem-sk-f" style="width:82%"></div></div></div>
+                <div class="prem-sk-it"><div class="prem-sk-n">Leadership</div><div class="prem-sk-bg"><div class="prem-sk-f" style="width:88%"></div></div></div>
+              </div>
+            </div>
+            <div class="prem-main">
+              <div class="prem-hd"><div class="prem-hd-n">Kofi Asante-Mensah</div><div class="prem-hd-t">Chief Financial Officer</div></div>
+              <div class="prem-body">
+                <div class="prem-sec"><div class="prem-sec-h">Profil Exécutif</div><div class="prem-it-desc">Dirigeant financier avec 15 ans d'expérience au sein de groupes panafricains. Architecte de stratégies M&amp;A en Afrique subsaharienne.</div></div>
+                <div class="prem-sec"><div class="prem-sec-h">Expériences</div>
+                  <div class="prem-it"><div class="prem-it-hd"><span class="prem-it-t">Chief Financial Officer</span><span class="prem-it-d">2019 — Présent</span></div><div class="prem-it-s">Ecobank Transnational — Lomé, Togo</div><div class="prem-it-desc">Supervision financière de 36 filiales (2,8 Mds USD d'actifs). 4 opérations M&amp;A pilotées.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ex-footer"><span>CV Premium — Finance</span><button onclick="event.stopPropagation();selectPlan('premium')">Créer →</button></div>
+      </div>
+    </div>
 
-  <form method="POST" enctype="multipart/form-data" id="cv-form">
-    <div class="form-grid">
-
-      <!-- Photo -->
-      <div class="form-group full">
-        <label>Photo de profil (optionnel)</label>
-        <div class="photo-upload" id="photo-drop">
-          <input type="file" name="photo" accept="image/*" id="photo-input" onchange="previewPhoto(this)">
-          <div class="photo-upload-icon">📷</div>
-          <p>Glissez votre photo ici ou <strong>cliquez pour choisir</strong></p>
-          <p style="font-size:12px;margin-top:4px;">JPG, PNG, WEBP — max 5MB</p>
-          <img id="photo-preview" src="" alt="Preview">
+    <!-- PLANS -->
+    <div id="plans-anchor">
+      <div class="stag" style="margin-top:0">Nos formules</div>
+      <h2 class="sh2" style="margin-bottom:32px">Choisissez votre <em>niveau</em></h2>
+      <div class="pl-grid">
+        <div class="pc" onclick="selectPlan('simple')">
+          <div class="ppz" style="background:#fff;padding:13px">
+            <div style="display:flex;align-items:center;gap:9px;padding-bottom:7px;border-bottom:1.5px solid #111;margin-bottom:7px">
+              <div style="width:34px;height:34px;border-radius:50%;background:#e0e0e0;border:1.5px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#888;flex-shrink:0">AM</div>
+              <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px">A. Mensah</div><div style="font-size:8.5px;color:#777;font-style:italic">Comptable Senior</div></div>
+            </div>
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#444;border-bottom:1px solid #ddd;padding-bottom:2px;margin-bottom:5px">Expérience</div>
+            <div style="height:3.5px;background:#ebebeb;border-radius:1px;margin-bottom:3px;width:95%"></div>
+            <div style="height:3.5px;background:#ebebeb;border-radius:1px;margin-bottom:3px;width:80%"></div>
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#444;border-bottom:1px solid #ddd;padding-bottom:2px;margin:7px 0 4px">Compétences</div>
+            <div style="display:flex;gap:3px;flex-wrap:wrap">
+              <span style="font-size:7.5px;padding:2px 6px;background:#f2f2f2;border:1px solid #ddd">SAP</span>
+              <span style="font-size:7.5px;padding:2px 6px;background:#f2f2f2;border:1px solid #ddd">OHADA</span>
+              <span style="font-size:7.5px;padding:2px 6px;background:#f2f2f2;border:1px solid #ddd">Excel</span>
+            </div>
+          </div>
+          <div class="pb">
+            <div class="pt">✦ Formule</div><div class="pn">Simple</div>
+            <div class="pd">Design épuré et professionnel. Reformulation IA incluse.</div>
+            <div class="pp"><span class="ppc">FCFA</span><span class="ppa">1 000</span></div>
+            <ul class="pf">
+              <li class="pfi"><span class="pfc">✓</span>Photo de profil ronde</li>
+              <li class="pfi"><span class="pfc">✓</span>5 templates classiques</li>
+              <li class="pfi"><span class="pfc">✓</span>Reformulation IA auto</li>
+              <li class="pfi"><span class="pfc">✓</span>PDF sans filigrane</li>
+              <li class="pfi"><span class="pfc">✓</span>Livraison immédiate</li>
+            </ul>
+            <button class="pc-btn pc-btn-s">Commencer →</button>
+          </div>
+        </div>
+        <div class="pc feat" onclick="selectPlan('pro')">
+          <div class="feat-badge">★ Populaire</div>
+          <div class="ppz" style="display:flex;background:#fff">
+            <div style="width:50px;flex-shrink:0;background:#183868;padding:9px 6px;display:flex;flex-direction:column;align-items:center;gap:5px">
+              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);margin-bottom:3px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:rgba(255,255,255,.45)">SK</div>
+              <div style="width:15px;height:2px;background:rgba(255,255,255,.2);border-radius:1px"></div>
+              <div style="width:11px;height:2px;background:rgba(255,255,255,.15);border-radius:1px"></div>
+              <div style="width:15px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;margin-top:5px"></div>
+              <div style="width:11px;height:2px;background:rgba(255,255,255,.08);border-radius:1px"></div>
+            </div>
+            <div style="flex:1;padding:9px 8px">
+              <div style="height:12px;background:#183868;margin-bottom:6px;border-radius:1px"></div>
+              <div style="height:3px;background:#eee;border-radius:1px;margin-bottom:3px;width:90%"></div>
+              <div style="height:3px;background:#eee;border-radius:1px;margin-bottom:3px;width:75%"></div>
+              <div style="height:3px;background:#eee;border-radius:1px;margin-bottom:8px;width:82%"></div>
+              <div style="height:8px;background:#183868;margin-bottom:6px;border-radius:1px;width:60%"></div>
+              <div style="height:3px;background:#eee;border-radius:1px;margin-bottom:3px;width:85%"></div>
+              <div style="height:3px;background:#eee;border-radius:1px;width:70%"></div>
+            </div>
+          </div>
+          <div class="pb">
+            <div class="pt">✦ Formule</div><div class="pn" style="color:var(--paper)">Professionnel</div>
+            <div class="pd">Design bicolore avec sidebar. 5 couleurs au choix.</div>
+            <div class="pp"><span class="ppc">FCFA</span><span class="ppa">1 500</span></div>
+            <ul class="pf">
+              <li class="pfi"><span class="pfc">✓</span>5 templates colorés distincts</li>
+              <li class="pfi"><span class="pfc">✓</span>Photo profil ronde</li>
+              <li class="pfi"><span class="pfc">✓</span>Reformulation IA complète</li>
+              <li class="pfi"><span class="pfc">✓</span>2 polices au choix</li>
+              <li class="pfi"><span class="pfc">✓</span>PDF sans filigrane</li>
+            </ul>
+            <button class="pc-btn pc-btn-p">Commencer →</button>
+          </div>
+        </div>
+        <div class="pc" onclick="selectPlan('premium')">
+          <div class="ppz" style="background:#0D1520;padding:8px;display:flex;align-items:center;justify-content:center">
+            <div style="width:90%;height:90%;display:flex">
+              <div style="width:28%;background:rgba(255,255,255,.06);border-radius:1px"></div>
+              <div style="flex:1;padding:6px">
+                <div style="height:18%;background:linear-gradient(90deg,#C49438,#7A4E0E);margin-bottom:4px;border-radius:1px"></div>
+                <div style="height:4px;background:rgba(255,255,255,.08);margin-bottom:3px;border-radius:1px;width:90%"></div>
+                <div style="height:4px;background:rgba(255,255,255,.06);margin-bottom:3px;border-radius:1px;width:75%"></div>
+                <div style="height:4px;background:rgba(255,255,255,.06);border-radius:1px;width:82%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="pb">
+            <div class="pt">✦ Formule</div><div class="pn">Premium</div>
+            <div class="pd">15 thèmes exclusifs. Photo hexagonale. Polices premium.</div>
+            <div class="pp"><span class="ppc">FCFA</span><span class="ppa">3 000</span></div>
+            <ul class="pf">
+              <li class="pfi"><span class="pfc">✓</span>15 templates premium exclusifs</li>
+              <li class="pfi"><span class="pfc">✓</span>Photo hexagonale ou ronde</li>
+              <li class="pfi"><span class="pfc">✓</span>5 polices premium</li>
+              <li class="pfi"><span class="pfc">✓</span>8 palettes de couleurs</li>
+              <li class="pfi"><span class="pfc">✓</span>Reformulation IA complète</li>
+            </ul>
+            <button class="pc-btn pc-btn-x">Commencer →</button>
+          </div>
         </div>
       </div>
-
-      <!-- Infos perso -->
-      <div class="form-divider full"><span>✦ Informations personnelles</span></div>
-
-      <div class="form-group">
-        <label>Nom complet <span class="req">✦</span></label>
-        <input type="text" name="nom" placeholder="Jean Dupont" required value="{{ request.form.get('nom', '') }}">
-      </div>
-      <div class="form-group">
-        <label>Poste recherché <span class="req">✦</span></label>
-        <input type="text" name="poste" placeholder="Développeur Web Senior" required value="{{ request.form.get('poste', '') }}">
-      </div>
-      <div class="form-group">
-        <label>Email <span class="req">✦</span></label>
-        <input type="email" name="email" placeholder="jean@exemple.com" required value="{{ request.form.get('email', '') }}">
-      </div>
-      <div class="form-group">
-        <label>Téléphone</label>
-        <input type="tel" name="telephone" placeholder="+33 6 00 00 00 00" value="{{ request.form.get('telephone', '') }}">
-      </div>
-      <div class="form-group">
-        <label>Ville</label>
-        <input type="text" name="ville" placeholder="Paris" value="{{ request.form.get('ville', '') }}">
-      </div>
-      <div class="form-group">
-        <label>Pays</label>
-        <input type="text" name="pays" placeholder="France" value="{{ request.form.get('pays', '') }}">
-      </div>
-
-      <!-- Objectif -->
-      <div class="form-divider full"><span>✦ Profil & Objectif</span></div>
-      <div class="form-group full">
-        <label>Objectif professionnel (optionnel)</label>
-        <textarea name="objectif" placeholder="Ex : Développeur passionné avec 5 ans d'expérience, je cherche à rejoindre une équipe innovante...">{{ request.form.get('objectif', '') }}</textarea>
-      </div>
-
-      <!-- Expérience -->
-      <div class="form-divider full"><span>✦ Parcours</span></div>
-      <div class="form-group full">
-        <label>Expériences professionnelles <span class="req">✦</span></label>
-        <textarea name="experience" style="min-height:130px" placeholder="- Développeur Full Stack chez Acme Corp (2020-2024) — Développement d'une plateforme SaaS
-- Chef de projet IT chez StartupXYZ (2018-2020) — Gestion d'une équipe de 5 développeurs
-...">{{ request.form.get('experience', '') }}</textarea>
-        <span style="font-size:11px;color:var(--muted)">Un élément par ligne. Commencez par - ou directement.</span>
-      </div>
-      <div class="form-group full">
-        <label>Formation <span class="req">✦</span></label>
-        <textarea name="formation" placeholder="- Master Informatique — Université Paris-Saclay (2018)
-- BTS SIO option SLAM (2016)
-...">{{ request.form.get('formation', '') }}</textarea>
-      </div>
-
-      <!-- Compétences -->
-      <div class="form-divider full"><span>✦ Compétences & Langues</span></div>
-      <div class="form-group">
-        <label>Compétences</label>
-        <textarea name="competences" placeholder="- Python, Flask, Django
-- React, Vue.js
-- Docker, AWS
-- SQL, MongoDB">{{ request.form.get('competences', '') }}</textarea>
-      </div>
-      <div class="form-group">
-        <label>Langues</label>
-        <textarea name="langues" placeholder="- Français (natif)
-- Anglais (courant)
-- Espagnol (notions)">{{ request.form.get('langues', '') }}</textarea>
-      </div>
-
-      <!-- Template -->
-      <div class="form-divider full"><span>✦ Choisissez votre template</span></div>
-      <div class="template-cards">
-
-        <label class="template-card selected" id="card-simple">
-          <input type="radio" name="template" value="simple" checked>
-          <div class="check"></div>
-          <div class="template-preview preview-simple">
-            <div class="preview-line medium"></div>
-            <div class="preview-line short"></div>
-            <div style="flex:1"></div>
-            <div class="preview-line medium"></div>
-            <div class="preview-line short"></div>
-            <div class="preview-line medium"></div>
-          </div>
-          <div class="template-name">Simple</div>
-          <div class="template-desc">Propre et lisible · fond blanc · police classique · idéal pour les débutants</div>
-          <span class="template-badge badge-free">Classique</span>
-        </label>
-
-        <label class="template-card" id="card-professionnel">
-          <input type="radio" name="template" value="professionnel">
-          <div class="check"></div>
-          <div class="template-preview preview-pro">
-            <div class="preview-sidebar">
-              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.25);margin:0 auto 5px;"></div>
-              <div class="preview-line white short"></div>
-              <div class="preview-line white medium"></div>
-              <div class="preview-line white short"></div>
-            </div>
-            <div class="preview-main">
-              <div class="preview-line white medium"></div>
-              <div class="preview-line white short"></div>
-              <div style="height:1px;background:rgba(255,255,255,0.15);margin:4px 0;"></div>
-              <div class="preview-line white medium"></div>
-              <div class="preview-line white short"></div>
-            </div>
-          </div>
-          <div class="template-name">Professionnel</div>
-          <div class="template-desc">Sidebar colorée · photo ronde · barres de compétences · design moderne</div>
-          <span class="template-badge badge-pro">⭐ Recommandé</span>
-        </label>
-
-        <label class="template-card" id="card-premium">
-          <input type="radio" name="template" value="premium">
-          <div class="check"></div>
-          <div class="template-preview preview-premium">
-            <div class="preview-premium-glow"></div>
-            <div style="display:flex;height:100%;position:relative;z-index:1;">
-              <div class="preview-sidebar-dark">
-                <div class="preview-hex"></div>
-                <div class="preview-dark-line" style="width:90%;"></div>
-                <div class="preview-dark-line" style="width:65%;"></div>
-                <div class="preview-dark-line" style="width:80%;"></div>
-              </div>
-              <div class="preview-main-premium">
-                <div class="preview-gold"></div>
-                <div class="preview-dark-line" style="background:rgba(30,32,48,0.7);width:80%;"></div>
-                <div class="preview-dark-line" style="background:rgba(30,32,48,0.5);width:60%;"></div>
-                <div class="preview-dark-line" style="background:rgba(30,32,48,0.5);width:75%;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="template-name">Premium</div>
-          <div class="template-desc">Sidebar sombre · dégradé doré · photo hexagonale · look prestige</div>
-          <span class="template-badge badge-premium">✦ Prestige</span>
-        </label>
-
-      </div>
-
-      <!-- Submit -->
-      <div class="submit-area">
-        <button type="submit" class="btn-submit" id="submit-btn">
-          <span class="spinner"></span>
-          <span class="btn-text">Générer mon CV</span>
-        </button>
-        <p class="submit-note">🔒 Vos données sont sécurisées · Preview gratuite · PDF après paiement</p>
-      </div>
-
     </div>
-  </form>
-</section>
+  </div>
 
-<footer>
-  <strong>CréaCV</strong> — Votre CV professionnel en quelques minutes.<br>
-  <span style="font-size:11px;">Pour toute question, contactez-nous sur WhatsApp.</span>
-</footer>
+  <!-- FAQ -->
+  <div class="sec" style="padding-top:0">
+    <div class="stag">Questions fréquentes</div>
+    <h2 class="sh2" style="margin-bottom:28px">Tout ce que vous <em>devez savoir</em></h2>
+    <div class="faq-wrap">
+      <div class="faq-it"><div class="faq-q" onclick="toggleFaq(this)">Comment ça marche ?</div><div class="faq-a">Remplis le formulaire, choisis ton plan, paie via mobile money (Wave, MoMo, OPay, Orange Money, Flooz, T-Money), et télécharge ton PDF immédiatement après confirmation du paiement. Zéro attente, zéro validation manuelle.</div></div>
+      <div class="faq-it"><div class="faq-q" onclick="toggleFaq(this)">Quels moyens de paiement ?</div><div class="faq-a">Wave, MoMo, OPay, Orange Money, Flooz et T-Money via notre partenaire de paiement LeekPay. Aucune carte bancaire requise.</div></div>
+      <div class="faq-it"><div class="faq-q" onclick="toggleFaq(this)">Est-ce que mon CV est sauvegardé ?</div><div class="faq-a">Ton CV est généré en temps réel dans ton navigateur. Télécharge-le immédiatement après paiement. Pour une nouvelle version, reviens sur le site et remplis à nouveau le formulaire.</div></div>
+      <div class="faq-it"><div class="faq-q" onclick="toggleFaq(this)">Je n'arrive pas à télécharger mon CV.</div><div class="faq-a">Contacte-nous sur WhatsApp au +228 98 48 99 84 — nous te répondons rapidement et t'envoyons ton fichier manuellement si nécessaire. Nous ne te laissons jamais sans solution.</div></div>
+      <div class="faq-it"><div class="faq-q" onclick="toggleFaq(this)">Puis-je modifier mon CV après paiement ?</div><div class="faq-a">Oui ! Reviens sur le site, modifie le formulaire et repasse au paiement pour télécharger la nouvelle version mise à jour.</div></div>
+      <div class="faq-it"><div class="faq-q" onclick="toggleFaq(this)">Le site fonctionne sur mobile ?</div><div class="faq-a">Oui, CVCraft est entièrement optimisé pour les smartphones Android et iOS. Tu peux créer et télécharger ton CV directement depuis ton téléphone.</div></div>
+    </div>
+  </div>
 
+  <footer class="ft">
+    <div class="ft-lo"><div class="ft-lb">CV</div><span style="font-family:var(--FD);font-size:17px;font-weight:700">CV<em style="font-style:italic;color:var(--amber)">Craft</em></span></div>
+    <div>© 2026 CVCraft · Généré avec ❤ pour l'Afrique de l'Ouest · Support : <a href="https://wa.me/22898489984" style="color:var(--amberl)">wa.me/22898489984</a></div>
+    <div>Paiement validé par <span style="color:var(--amberl)">LeekPay</span></div>
+  </footer>
+</div>
+<!-- ═══════════ FORM PAGE ═══════════ -->
+<div id="page-form" class="page">
+<div class="fpage">
+  <div class="fhero">
+    <div class="fhero-tag" id="fh-tag">✦ CV Professionnel</div>
+    <h2 data-i18n="form_title">Complétez votre profil</h2>
+    <p data-i18n="form_sub">Vos textes sont reformulés et corrigés automatiquement · Paiement après aperçu</p>
+    <div class="fprog"><div class="fprog-b" id="prog-b" style="width:8%"></div></div>
+  </div>
+
+  <!-- Plan strip -->
+  <div class="plan-strip">
+    <span class="plan-strip-lbl">Formule :</span>
+    <button class="ps-btn" id="ps-simple" onclick="selectPlan('simple')">Simple — 1 000 FCFA</button>
+    <button class="ps-btn on" id="ps-pro" onclick="selectPlan('pro')">★ Pro — 1 500 FCFA</button>
+    <button class="ps-btn" id="ps-premium" onclick="selectPlan('premium')">Premium — 3 000 FCFA</button>
+  </div>
+
+  <!-- Sector bar -->
+  <div class="sector-bar">
+    <label for="f-secteur">Secteur :</label>
+    <select id="f-secteur" onchange="onSectorChange()">
+      <option value="">-- Choisir votre secteur --</option>
+      <option value="ong">ONG / Multilatéral (UNDP, UNICEF, PAM…)</option>
+      <option value="banque">Banque / Finance / Microfinance</option>
+      <option value="tech">Télécoms / Tech / Startups</option>
+      <option value="admin">Administration publique / Fonction publique</option>
+      <option value="sante">Santé / Médical / Pharmaceutique</option>
+      <option value="education">Education / Recherche / Formation</option>
+      <option value="commerce">Commerce / Distribution / Import-Export</option>
+      <option value="agriculture">Agriculture / Agro-industrie</option>
+      <option value="autre">Autre</option>
+    </select>
+    <button class="ex-btn" onclick="fillExample()">🎲 <span data-i18n="use_example">Utiliser un exemple</span></button>
+  </div>
+
+  <div class="flayout">
+    <!-- STYLE CARD -->
+    <div class="fc" id="card-style">
+      <div class="fch"><div class="sb">1</div><div><div class="fct">Apparence &amp; Modèle</div><div class="fcs">Template, police et couleurs</div></div></div>
+      <div class="fcb">
+        <div class="fld" style="margin-bottom:16px"><label>Modèle de CV</label><div class="tg" id="tmpl-grid"></div></div>
+        <div id="font-blk" class="fld" style="margin-bottom:16px;display:none"><label>Police d'écriture</label><div class="fps" id="font-pills"></div></div>
+        <div id="grad-blk" class="fld" style="display:none"><label>Palette de couleurs</label><div class="gp-row" id="grad-row"></div></div>
+      </div>
+    </div>
+
+    <!-- INFO CARD -->
+    <div class="fc">
+      <div class="fch"><div class="sb" id="b-info">2</div><div><div class="fct">Informations personnelles</div><div class="fcs">Photo, coordonnées et résumé</div></div></div>
+      <div class="fcb">
+        <div style="margin-bottom:16px">
+          <div class="fld" style="margin-bottom:6px"><label>Photo de profil</label></div>
+          <div class="pzone" id="photo-zone" onclick="document.getElementById('photo-in').click()">
+            <div class="pzone-ic">📷</div>
+            <div class="pzone-lb">Cliquer pour sélectionner votre photo</div>
+            <div class="pzone-ht">JPG ou PNG · Carré recommandé · Max 5 Mo</div>
+          </div>
+          <div class="pprev" id="photo-prev">
+            <img id="photo-img" src="" alt="">
+            <div><div style="font-size:13px;font-weight:600;color:var(--forest);margin-bottom:5px">✓ Photo chargée</div><button class="pprev-rm" onclick="clearPhoto(event)">Supprimer</button></div>
+          </div>
+          <input type="file" id="photo-in" accept="image/*" style="display:none" onchange="onPhoto(this)">
+        </div>
+        <div class="g2">
+          <div class="fld" id="fld-first"><label>Prénom <span>*</span></label><input type="text" id="f-first" placeholder="Aminata"><span class="err-msg">Requis</span></div>
+          <div class="fld" id="fld-last"><label>Nom <span>*</span></label><input type="text" id="f-last" placeholder="Mensah"><span class="err-msg">Requis</span></div>
+        </div>
+        <div class="g2">
+          <div class="fld" id="fld-job"><label>Poste visé <span>*</span></label><input type="text" id="f-job" placeholder="Responsable Comptable Senior"><span class="err-msg">Requis</span></div>
+          <div class="fld" id="fld-email"><label>Email <span>*</span></label><input type="email" id="f-email" placeholder="aminata@email.com"><span class="err-msg">Email invalide</span></div>
+        </div>
+        <div class="g2">
+          <div class="fld"><label>Téléphone</label>
+            <div style="display:flex;gap:6px">
+              <select id="f-indicatif" style="width:95px;flex-shrink:0">
+                <option value="+228">🇹🇬 +228</option>
+                <option value="+225">🇨🇮 +225</option>
+                <option value="+221">🇸🇳 +221</option>
+                <option value="+234">🇳🇬 +234</option>
+                <option value="+233">🇬🇭 +233</option>
+                <option value="+226">🇧🇫 +226</option>
+                <option value="+224">🇬🇳 +224</option>
+                <option value="+223">🇲🇱 +223</option>
+                <option value="+229">🇧🇯 +229</option>
+              </select>
+              <input type="tel" id="f-phone" placeholder="90 00 00 00" style="flex:1">
+            </div>
+          </div>
+          <div class="fld"><label>Ville, Pays</label><input type="text" id="f-loc" placeholder="Lomé, Togo"></div>
+        </div>
+        <div class="g1"><div class="fld"><label>LinkedIn / Portfolio <span>(optionnel)</span></label><input type="text" id="f-li" placeholder="linkedin.com/in/monprofil"></div></div>
+        <div class="g1">
+          <div class="fld"><label>Résumé professionnel <span>*</span></label><textarea id="f-sum" rows="4" placeholder="Décrivez votre profil : points forts, expertise, objectifs professionnels..."></textarea></div>
+        </div>
+        <div class="ai-row">
+          <button class="ai-btn" onclick="rewriteWithAI()">🤖 <span data-i18n="ai_rewrite">Reformuler avec l'IA</span></button>
+          <div class="ai-spin" id="ai-spin"></div>
+          <span class="ai-txt" id="ai-txt"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXP CARD -->
+    <div class="fc">
+      <div class="fch"><div class="sb" id="b-exp">3</div><div><div class="fct">Expériences professionnelles</div><div class="fcs">De la plus récente à la plus ancienne</div></div></div>
+      <div class="fcb"><div id="exp-list"></div><button class="add-btn" onclick="addExp()">+ <span data-i18n="add_exp">Ajouter une expérience</span></button></div>
+    </div>
+
+    <!-- EDU CARD -->
+    <div class="fc">
+      <div class="fch"><div class="sb" id="b-edu">4</div><div><div class="fct">Formation académique</div><div class="fcs">Diplômes et certifications</div></div></div>
+      <div class="fcb"><div id="edu-list"></div><button class="add-btn" onclick="addEdu()">+ <span data-i18n="add_edu">Ajouter une formation</span></button></div>
+    </div>
+
+    <!-- SKILLS CARD -->
+    <div class="fc">
+      <div class="fch"><div class="sb" id="b-sk">5</div><div><div class="fct">Compétences &amp; Langues</div></div></div>
+      <div class="fcb">
+        <div style="font-size:12px;font-weight:600;color:var(--ash);margin-bottom:8px">Compétences suggérées selon votre secteur :</div>
+        <div class="sk-tags" id="sk-suggested"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--void);margin-bottom:7px;margin-top:12px">Compétences personnalisées :</div>
+        <div id="skill-list"></div>
+        <button class="add-btn" onclick="addSkill()">+ <span data-i18n="add_skill">Ajouter une compétence</span></button>
+        <div style="margin:16px 0 7px;padding-top:13px;border-top:1px solid var(--paper2);font-size:12px;font-weight:600;color:var(--void)">Langues</div>
+        <div id="lang-list"></div>
+        <button class="add-btn" onclick="addLang()">+ <span data-i18n="add_lang">Ajouter une langue</span></button>
+      </div>
+    </div>
+
+    <!-- INTERESTS -->
+    <div class="fc">
+      <div class="fch"><div class="sb">6</div><div><div class="fct">Centres d'intérêt <span style="font-size:11px;font-weight:400;color:var(--ash)">— optionnel</span></div></div></div>
+      <div class="fcb"><div class="g1"><div class="fld"><label>Centres d'intérêt</label><input type="text" id="f-int" placeholder="Photographie, Voyages, Lecture, Football..."></div></div></div>
+    </div>
+
+    <!-- GENERATE -->
+    <div class="gz">
+      <button class="gen-btn" id="gen-btn" onclick="doGenerate()"><span style="font-size:15px">✦</span> <span data-i18n="gen_btn">Générer mon CV</span></button>
+      <div class="gen-ht" data-i18n="gen_hint">Textes reformulés et corrigés automatiquement · Aperçu instantané</div>
+    </div>
+  </div>
+
+  <!-- Mobile sticky pay -->
+  <div class="sticky-pay">
+    <div class="sticky-pay-info" id="sticky-plan-info">Plan Pro — 1 500 FCFA</div>
+    <button class="sticky-pay-btn" onclick="doGenerate()">Voir mon CV →</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ PREVIEW PAGE ═══════════ -->
+<div id="page-preview" class="page">
+<div class="pvpage">
+  <div class="pvtb">
+    <div class="pvtb-l">
+      <button class="pvtb-bk" onclick="goForm()">← <span data-i18n="modify">Modifier</span></button>
+      <div class="pvtb-dv"></div>
+      <span class="pvtb-lb" data-i18n="preview_lbl">Aperçu de votre CV</span>
+    </div>
+    <div class="pvtb-r">
+      <button class="pay-pill" onclick="openPayModal(false)" id="pv-pay-btn">🔒 <span data-i18n="pay_now">Payer maintenant</span></button>
+      <div class="timer-p">
+        <div class="tpulse"></div>
+        <span class="tdig" id="timer-txt">01:00</span>
+      </div>
+    </div>
+  </div>
+  <div class="pv-layout">
+    <div>
+      <div style="position:relative;display:inline-block;width:100%;max-width:794px">
+        <div class="pv-paper" id="cv-paper" style="overflow:hidden;width:100%;max-width:794px"></div>
+        <div class="blur-gate" id="blur-gate">
+          <div class="bg-lock">🔒</div>
+          <div class="bg-title">Prévisualisation expirée</div>
+          <div class="bg-text">Procédez au paiement LeekPay. Votre CV sera déverrouillé automatiquement.</div>
+          <button class="bg-btn" onclick="openPayModal(false)">Payer &amp; Télécharger →</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="order-box">
+        <div class="order-title" data-i18n="your_order">Votre commande</div>
+        <div class="order-row"><span id="order-plan-name">CV Professionnel</span><strong id="order-plan-price">1 500 FCFA</strong></div>
+        <div class="order-row" style="font-size:12px;color:var(--ash)"><span>PDF A4 · Sans filigrane</span><span>✓</span></div>
+        <div class="order-row" style="font-size:12px;color:var(--ash)"><span>Livraison immédiate</span><span>✓</span></div>
+        <div class="order-methods">💳 Paiement via <strong>Wave · MoMo · OPay · Orange Money · T-Money · Flooz</strong></div>
+        <button class="order-pay-btn" onclick="openPayModal(false)">🔒 <span data-i18n="pay_download">Payer et télécharger</span></button>
+        <button class="order-back" onclick="goForm()" data-i18n="edit_cv">← Modifier mon CV</button>
+        <div style="margin-top:12px;padding:10px;background:var(--ghost);border-radius:var(--rm);font-size:11.5px;color:var(--ash);text-align:center">
+          Un problème ? <a href="https://wa.me/22898489984" target="_blank" style="color:var(--amber);font-weight:600">WhatsApp +228 98 48 99 84</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ SUCCESS PAGE ═══════════ -->
+<div id="page-success" class="page">
+<div class="success-page">
+  <div class="success-ic">✅</div>
+  <h1 data-i18n="pay_confirmed">Paiement confirmé !</h1>
+  <p data-i18n="cv_ready">Ton CV est prêt. Clique ci-dessous pour télécharger ton PDF immédiatement.</p>
+  <button class="dl-btn-main" onclick="downloadCV()">⬇ <span data-i18n="dl_pdf">Télécharger mon CV PDF</span></button>
+  <div class="dl-note" data-i18n="dl_note">Dans la fenêtre qui s'ouvre : Fichier → Imprimer → Enregistrer en PDF</div>
+  <div class="upsell-c">
+    <h3>🚀 Boostez votre candidature !</h3>
+    <p>Obtenez une lettre de motivation personnalisée rédigée par nos experts pour votre secteur d'activité.</p>
+    <button class="upsell-wa" onclick="window.open('https://wa.me/22898489984?text=Bonjour%2C%20je%20veux%20une%20lettre%20de%20motivation%20après%20avoir%20créé%20mon%20CV%20sur%20CVCraft','_blank')">💬 Obtenir ma lettre sur WhatsApp</button>
+  </div>
+  <button onclick="goHome()" style="margin-top:20px;height:36px;padding:0 20px;background:transparent;border:1px solid var(--paper3);border-radius:2px;font-size:13px;cursor:pointer;font-family:var(--FU);color:var(--ash);transition:all .14s" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--paper3)';this.style.color='var(--ash)'" data-i18n="back_home">← Retour à l'accueil</button>
+</div>
+</div>
+
+<!-- ═══════════ ADMIN PAGE ═══════════ -->
+<div id="page-admin" class="page">
+<div class="adm-page">
+  <div id="adm-login-screen" class="adm-login">
+    <div class="adm-login-box">
+      <div style="font-size:30px;margin-bottom:12px">🔐</div>
+      <h2>Espace Admin</h2>
+      <p>Connectez-vous pour accéder au tableau de bord CVCraft</p>
+      <div class="fld" style="margin-bottom:10px"><label>Identifiant</label><input type="text" id="adm-u" class="adm-login-input" placeholder="admin" onkeydown="if(event.key==='Enter')admLogin()"></div>
+      <div class="fld" style="margin-bottom:16px"><label>Mot de passe</label><input type="password" id="adm-p" class="adm-login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')admLogin()"></div>
+      <button class="adm-login-btn" onclick="admLogin()">Se connecter</button>
+      <div class="adm-err" id="adm-err">Identifiant ou mot de passe incorrect</div>
+    </div>
+  </div>
+  <div id="adm-dash" style="display:none">
+    <div class="adm-layout">
+      <div class="adm-sb">
+        <div class="adm-sb-hd"><div class="adm-sb-hd-t">CVCraft Admin</div><div class="adm-sb-hd-s">Tableau de bord</div></div>
+        <div class="adm-nav on" onclick="admTab('overview',this)"><span class="adm-nav-ic">📊</span> Vue d'ensemble</div>
+        <div class="adm-nav" onclick="admTab('transactions',this)"><span class="adm-nav-ic">💳</span> Transactions</div>
+        <div class="adm-nav" onclick="admTab('downloads',this)"><span class="adm-nav-ic">📥</span> Téléchargements</div>
+        <div class="adm-nav" onclick="admTab('clients',this)"><span class="adm-nav-ic">👤</span> Clients</div>
+        <div class="adm-nav" onclick="admTab('analytics',this)"><span class="adm-nav-ic">📈</span> Analytiques</div>
+        <div class="adm-nav" onclick="admTab('settings',this)"><span class="adm-nav-ic">⚙</span> Paramètres</div>
+        <div class="adm-lo"><button class="adm-lo-btn" onclick="admLogout()">Déconnexion</button></div>
+      </div>
+      <div class="adm-main">
+        <!-- OVERVIEW -->
+        <div id="tab-overview" class="adm-tab active">
+          <div class="adm-pt">Vue d'ensemble</div>
+          <div class="adm-ps" id="adm-date">Chargement...</div>
+          <div class="guide-box"><b>Bienvenue dans votre dashboard CVCraft.</b> Toutes les transactions sont enregistrées automatiquement. Les téléchargements sont approuvés automatiquement après paiement (validation manuelle désactivée par défaut). Pour exporter vos transactions : Onglet Transactions → Exporter CSV. Support : <a href="https://wa.me/22898489984" style="color:var(--amber)">wa.me/22898489984</a></div>
+          <div class="kpi-grid">
+            <div class="kpi g"><div class="kpi-lb">Revenus totaux</div><div class="kpi-v" id="kv-rev">0 FCFA</div><div class="kpi-s"><span class="ku" id="ks-rev">↑ 0%</span> vs mois préc.</div></div>
+            <div class="kpi b"><div class="kpi-lb">CV générés</div><div class="kpi-v" id="kv-cv">0</div><div class="kpi-s"><span class="ku" id="ks-cv">↑ 0</span> cette semaine</div></div>
+            <div class="kpi a"><div class="kpi-lb">Paiements confirmés</div><div class="kpi-v" id="kv-pay">0</div><div class="kpi-s"><span class="ku" id="ks-pay">↑ 0</span> aujourd'hui</div></div>
+            <div class="kpi r"><div class="kpi-lb">Taux de conversion</div><div class="kpi-v" id="kv-conv">0%</div><div class="kpi-s">30 derniers jours</div></div>
+          </div>
+          <div class="ch-grid">
+            <div class="ch"><div class="ch-t">Revenus par jour — 30 jours</div><div class="ch-s">En FCFA, tous niveaux</div><div class="ch-wrap"><canvas id="ch-rev"></canvas></div></div>
+            <div class="ch"><div class="ch-t">Répartition par formule</div><div class="ch-s">Part de chaque niveau</div><div class="ch-wrap"><canvas id="ch-plans"></canvas></div></div>
+          </div>
+          <div class="ch-grid2">
+            <div class="ch"><div class="ch-t">CV générés par semaine</div><div class="ch-s">12 dernières semaines</div><div class="ch-wrap"><canvas id="ch-cvs"></canvas></div></div>
+            <div class="ch"><div class="ch-t">Taux de conversion mensuel</div><div class="ch-s">% clients payants</div><div class="ch-wrap"><canvas id="ch-conv"></canvas></div></div>
+          </div>
+        </div>
+        <!-- TRANSACTIONS -->
+        <div id="tab-transactions" class="adm-tab" style="display:none">
+          <div class="adm-pt">Transactions LeekPay</div>
+          <div class="adm-ps">Historique complet des paiements confirmés</div>
+          <div style="margin-bottom:14px"><button onclick="exportCSV()" style="height:34px;padding:0 16px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--FU)">⬇ Exporter CSV</button></div>
+          <div class="tcard">
+            <div class="tcard-hd"><span class="tcard-t">Toutes les transactions</span><span class="tcard-count" id="tx-count">0 entrées</span></div>
+            <table class="ttb"><thead><tr><th>Date</th><th>Client</th><th>Formule</th><th>Montant</th><th>Statut</th><th>Référence</th></tr></thead><tbody id="tx-tbody"></tbody></table>
+          </div>
+        </div>
+        <!-- DOWNLOADS -->
+        <div id="tab-downloads" class="adm-tab" style="display:none">
+          <div class="adm-pt">Téléchargements</div>
+          <div class="adm-ps">Historique des CV téléchargés (approuvés automatiquement)</div>
+          <div class="tcard">
+            <div class="tcard-hd"><span class="tcard-t">Demandes de téléchargement</span><span class="tcard-count" id="dl-count">0</span></div>
+            <table class="ttb"><thead><tr><th>Date</th><th>Client</th><th>Email</th><th>Formule</th><th>Montant</th><th>Statut</th></tr></thead><tbody id="dl-tbody"></tbody></table>
+          </div>
+        </div>
+        <!-- CLIENTS -->
+        <div id="tab-clients" class="adm-tab" style="display:none">
+          <div class="adm-pt">Clients</div>
+          <div class="adm-ps">Liste de tous les clients ayant utilisé CVCraft</div>
+          <div class="tcard">
+            <div class="tcard-hd"><span class="tcard-t">Base clients</span><span class="tcard-count" id="cl-count">0 clients</span></div>
+            <table class="ttb"><thead><tr><th>Nom</th><th>Email</th><th>Formule</th><th>Date</th><th>Payé</th><th>Statut</th></tr></thead><tbody id="cl-tbody"></tbody></table>
+          </div>
+        </div>
+        <!-- ANALYTICS -->
+        <div id="tab-analytics" class="adm-tab" style="display:none">
+          <div class="adm-pt">Analytiques avancées</div>
+          <div class="adm-ps">Données détaillées de performance</div>
+          <div class="ch-grid2">
+            <div class="ch"><div class="ch-t">Revenus cumulés par formule</div><div class="ch-s">Contribution de chaque niveau</div><div class="ch-wrap"><canvas id="ch-rp"></canvas></div></div>
+            <div class="ch"><div class="ch-t">Activité par heure (24h)</div><div class="ch-s">Générations de CV sur la journée type</div><div class="ch-wrap"><canvas id="ch-hr"></canvas></div></div>
+          </div>
+          <div class="kpi-grid" style="margin-top:0">
+            <div class="kpi g"><div class="kpi-lb">Revenu moyen / CV</div><div class="kpi-v" id="an-avg" style="font-size:22px">0 FCFA</div></div>
+            <div class="kpi b"><div class="kpi-lb">Formule la plus populaire</div><div class="kpi-v" id="an-top" style="font-size:22px">—</div></div>
+            <div class="kpi a"><div class="kpi-lb">CV téléchargés</div><div class="kpi-v" id="an-dl">0</div></div>
+            <div class="kpi r"><div class="kpi-lb">Taux d'abandon</div><div class="kpi-v" id="an-drop">0%</div><div class="kpi-s">Génèrent sans payer</div></div>
+          </div>
+        </div>
+        <!-- SETTINGS -->
+        <div id="tab-settings" class="adm-tab" style="display:none">
+          <div class="adm-pt">Paramètres</div>
+          <div class="adm-ps">Configuration de la plateforme CVCraft</div>
+          <div class="sg">
+            <div class="sg-t">Sécurité</div>
+            <div class="sr"><div><div class="sr-lb">Nouveau mot de passe</div></div><input type="password" id="new-pw" placeholder="Nouveau mot de passe" style="width:200px;height:36px;font-size:13px"></div>
+            <button onclick="changeAdminPw()" style="margin-top:10px;height:36px;padding:0 18px;background:var(--void);color:var(--paper);border:none;border-radius:2px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--FU)">Enregistrer le mot de passe</button>
+            <div id="pw-msg" style="font-size:12px;margin-top:6px;"></div>
+          </div>
+          <div class="sg">
+            <div class="sg-t">Fonctionnalités</div>
+            <div class="sr"><div><div class="sr-lb">Validation manuelle des téléchargements</div><div class="sr-s">Si activé, l'admin doit approuver chaque téléchargement (désactivé par défaut)</div></div><label class="tog"><input type="checkbox" id="tog-adm"><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+            <div class="sr"><div><div class="sr-lb">Timer de pression (60 sec)</div><div class="sr-s">Flou automatique après 1 minute sur l'aperçu</div></div><label class="tog"><input type="checkbox" id="tog-timer" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+            <div class="sr"><div><div class="sr-lb">Reformulation IA automatique</div><div class="sr-s">Reformule les textes via l'API Claude</div></div><label class="tog"><input type="checkbox" id="tog-ai" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+          </div>
+          <div class="sg">
+            <div class="sg-t">Données</div>
+            <button onclick="if(confirm('Effacer toutes les données ?')){localStorage.removeItem('cvcraft_db_v3');toast('Données effacées');}" style="height:36px;padding:0 18px;background:var(--ruby);color:#fff;border:none;border-radius:2px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--FU)">Effacer toutes les données</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="mveil" id="pay-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pmbox">
+    <div class="pm-hd">
+      <div class="pm-ic">💳</div>
+      <div class="pm-title">Finaliser la commande</div>
+      <div class="pm-sub" id="pm-sub">Paiement sécurisé via LeekPay</div>
+    </div>
+    <div class="pm-body">
+      <div id="pm-init">
+        <div class="price-box">
+          <div class="price-lbl">Total à régler</div>
+          <div class="price-val"><span class="price-cur">FCFA </span><span class="price-big" id="pm-price">1 500</span></div>
+        </div>
+        <ul class="pm-feats" id="pm-feats"></ul>
+        <button class="pay-now-btn" onclick="goPay()"><span>🔒</span> Payer via LeekPay</button>
+        <div class="pay-note">◆ ACCÈS AUTOMATIQUE APRÈS CONFIRMATION ◆ SANS VALIDATION MANUELLE</div>
+      </div>
+      <div class="pay-wait" id="pm-wait">
+        <div class="pay-spinner"></div>
+        <div class="pay-wait-t">En attente de confirmation LeekPay...</div>
+        <div class="pay-wait-s">Complétez le paiement dans la fenêtre ouverte. Votre CV sera déverrouillé automatiquement dès confirmation.</div>
+        <div class="pay-timer-bar"><div class="pay-timer-fill" id="ptfill" style="width:100%"></div></div>
+        <div style="font-family:var(--FM);font-size:10px;color:var(--ash);text-align:center;margin-bottom:14px" id="pm-countdown">05:00</div>
+        <button class="pay-man-btn" onclick="manualConfirm()">✓ J'ai payé — Confirmer manuellement</button>
+        <div style="text-align:center;margin-top:10px"><a href="https://wa.me/22898489984?text=J%27ai%20un%20problème%20de%20paiement%20sur%20CVCraft" target="_blank" style="font-size:12px;color:var(--amber)">💬 Besoin d'aide ? WhatsApp</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="t-ic"></span><span id="t-msg"></span></div>
 <script>
-  // Template selection
-  document.querySelectorAll('.template-card').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
+// ═══════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════
+const CFG = {
+  LP_PUB:      'pk_live_yXrH97aZ0APcEsQCMAtBJEWPPf1JLYlV',
+  LP_SIMPLE:   'https://leekpay.me/cv_simple',
+  LP_PRO:      'https://leekpay.me/paiement-pour-telecharger-votre-cv-professionel',
+  LP_PREMIUM:  'https://leekpay.me/paiement-pour-telecharger-votre-cv-prenium',
+  WA:          '22898489984',
+  ADMIN_PW:    'JESUS',
+  SITE_URL:    'https://votre-site.com',
+};
+const PLANS = {
+  simple:  {label:'CV Simple',       amt:1000,  url:CFG.LP_SIMPLE,  feats:['5 templates classiques','Photo de profil','Reformulation IA','PDF sans filigrane','Livraison immédiate']},
+  pro:     {label:'CV Professionnel', amt:1500,  url:CFG.LP_PRO,     feats:['5 templates bicolores','Photo de profil','Reformulation IA complète','2 polices au choix','PDF sans filigrane']},
+  premium: {label:'CV Premium',      amt:3000,  url:CFG.LP_PREMIUM,  feats:['15 templates exclusifs','Photo hexagonale ou ronde','5 polices premium','8 palettes de couleurs','Reformulation IA complète']},
+};
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let S = {
+  lang: localStorage.getItem('cv_lang')||'fr',
+  plan: 'pro',
+  tmpl: 1,
+  font: 'DM Sans',
+  grad: 0,
+  photo: null,
+  exps: [], edus: [], skills: [], langs: [],
+  selSkills: [],
+};
+let admAttempts=0, admLockUntil=0, admPw=CFG.ADMIN_PW;
+let timerInt=null, payPollInt=null, payTimerInt=null, payTimeLeft=300;
+let liveDebounce=null;
+
+// ═══════════════════════════════════
+// TRANSLATIONS
+// ═══════════════════════════════════
+const TR = {
+  fr:{nav_home:'Accueil',nav_create:'Créer mon CV',hero_badge:'Générateur de CV — Afrique de l\'Ouest',hero_title:'Votre carrière,<em> sublimée.</em>',hero_sub:'CV professionnel adapté au marché africain · Paiement mobile money · PDF instantané dès 1 000 FCFA',hero_cta1:'Voir les exemples ↓',hero_cta2:'Choisir ma formule',how_tag:'Comment ça marche',step1_t:'Remplis le formulaire',step1_d:'Saisis tes informations. L\'aperçu se met à jour en temps réel.',step2_t:'Choisis ton plan',step2_d:'Paie via Wave, MoMo, OPay, Orange Money ou T-Money.',step3_t:'Télécharge ton PDF',step3_d:'Ton PDF est disponible immédiatement après paiement.',form_title:'Complétez votre profil',form_sub:'Textes reformulés automatiquement · Paiement après aperçu',use_example:'Utiliser un exemple',ai_rewrite:'Reformuler avec l\'IA',add_exp:'Ajouter une expérience',add_edu:'Ajouter une formation',add_skill:'Ajouter une compétence',add_lang:'Ajouter une langue',gen_btn:'Générer mon CV',gen_hint:'Aperçu instantané · Paiement sécurisé · PDF immédiat',modify:'Modifier',preview_lbl:'Aperçu de votre CV',pay_now:'Payer maintenant',your_order:'Votre commande',pay_download:'Payer et télécharger',edit_cv:'← Modifier mon CV',pay_confirmed:'Paiement confirmé !',cv_ready:'Ton CV est prêt. Clique ci-dessous pour télécharger ton PDF.',dl_pdf:'Télécharger mon CV PDF',dl_note:'Dans la fenêtre : Fichier → Imprimer → Enregistrer en PDF',back_home:'← Retour à l\'accueil',cv_profile:'Profil Professionnel',cv_exp:'Expérience Professionnelle',cv_edu:'Formation',cv_skills:'Compétences',cv_langs:'Langues',cv_interests:'Centres d\'intérêt'},
+  en:{nav_home:'Home',nav_create:'Create my CV',hero_badge:'CV Generator — West Africa',hero_title:'Your career,<em> elevated.</em>',hero_sub:'Professional CV for the African market · Mobile money payment · Instant PDF from 1,000 FCFA',hero_cta1:'See examples ↓',hero_cta2:'Choose a plan',how_tag:'How it works',step1_t:'Fill the form',step1_d:'Enter your info. Preview updates in real time.',step2_t:'Choose your plan',step2_d:'Pay via Wave, MoMo, OPay, Orange Money or T-Money.',step3_t:'Download your PDF',step3_d:'Your PDF is available immediately after payment.',form_title:'Complete your profile',form_sub:'Texts auto-rewritten · Payment after preview',use_example:'Use an example',ai_rewrite:'Rewrite with AI',add_exp:'Add experience',add_edu:'Add education',add_skill:'Add a skill',add_lang:'Add a language',gen_btn:'Generate my CV',gen_hint:'Instant preview · Secure payment · Immediate PDF',modify:'Edit',preview_lbl:'Preview your CV',pay_now:'Pay now',your_order:'Your order',pay_download:'Pay and download',edit_cv:'← Edit my CV',pay_confirmed:'Payment confirmed!',cv_ready:'Your CV is ready. Click below to download your PDF.',dl_pdf:'Download my CV PDF',dl_note:'In the window: File → Print → Save as PDF',back_home:'← Back to home',cv_profile:'Professional Profile',cv_exp:'Work Experience',cv_edu:'Education',cv_skills:'Skills',cv_langs:'Languages',cv_interests:'Interests'},
+};
+const t=k=>TR[S.lang][k]||TR.fr[k]||k;
+function applyTr(){document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const v=t(k);if(v)el.innerHTML=v;});}
+function toggleLang(){S.lang=S.lang==='fr'?'en':'fr';localStorage.setItem('cv_lang',S.lang);document.getElementById('lang-btn').textContent=S.lang==='fr'?'EN':'FR';applyTr();renderCV();}
+
+// ═══════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function goHome(){showPage('page-home');}
+function goForm(){showPage('page-form');stopTimer();}
+
+// ═══════════════════════════════════
+// SECTORS & SKILLS DATA
+// ═══════════════════════════════════
+const SECTOR_SKILLS={
+  ong:['Gestion de projet','Suivi-évaluation (S&E)','Rédaction de rapports','Logframe','Mobilisation communautaire','Budget & Reporting bailleur','Coordination inter-agences','Microsoft Office','KOBO/ODK','MEAL','Plaidoyer','Gestion de bases de données'],
+  banque:['Analyse financière','Gestion des risques','Crédit & Recouvrement','Conformité (KYC/AML)','OHADA','SYSCOHADA','IFRS','Trésorerie','Relation clientèle','Excel avancé','Audit interne','Microfinance','Bloomberg'],
+  tech:['Développement web','JavaScript','Python','React','Node.js','Agile/Scrum','UI/UX Design','API REST','Cloud AWS/GCP','Cybersécurité','Data Analysis','SQL','Git','Mobile Money API'],
+  admin:['Droit administratif','Marchés publics','Rédaction administrative','Gestion budgétaire','Planification stratégique','Archivage','Protocole','Coordination interministérielle','SIGFIP','LOGSYS','Contrôle interne'],
+  sante:['Soins aux patients','Santé publique','Épidémiologie','Gestion de pharmacie','SONU','PTME','Dossiers médicaux','Urgences médicales','Hygiène & Sécurité','Standards OMS','Triage','Télémédecine'],
+  education:['Pédagogie active','Conception de curricula','Évaluation des apprentissages','Gestion de classe','Tutorat','E-learning','Recherche académique','Rédaction scientifique','Encadrement étudiants','TICE','Formation des adultes'],
+  commerce:['Négociation commerciale','Gestion des stocks','Supply chain','CRM','Développement portefeuille client','Trade marketing','Import/Export','Incoterms','Management commercial','SAP','Force de vente'],
+  agriculture:['Agronomie','Gestion des intrants','Irrigation','Chaîne de valeur agricole','BPA','Certification GlobalGAP','Financement agricole','Coopératives','SIG/Cartographie','Agroforesterie','Marchés agricoles'],
+  autre:['Gestion de projet','Leadership','Communication','Excel','Microsoft Office','Anglais professionnel','Travail en équipe','Analyse et synthèse','Rédaction professionnelle'],
+};
+const AI_FALLBACK={
+  ong:'Professionnel(le) du développement engagé(e), avec une expertise reconnue en gestion de projets et programmes à impact social. Maîtrise des outils de suivi-évaluation et des standards des bailleurs internationaux (UE, USAID, Nations Unies). Capacité avérée à mobiliser les communautés et à produire des rapports de qualité orientés résultats.',
+  banque:'Analyste financier rigoureux avec une solide expertise en gestion des risques et des portefeuilles. Maîtrise des référentiels comptables OHADA et IFRS. Orienté performance, avec un historique de résultats probants en analyse crédit, conformité réglementaire et relation clientèle.',
+  tech:'Développeur full-stack passionné par la création de produits numériques à fort impact. Maîtrise des technologies web modernes et des méthodologies agiles. Expérience éprouvée dans la livraison de solutions scalables pour des marchés émergents en forte croissance.',
+  admin:'Cadre de la fonction publique avec une expertise reconnue en gestion des finances publiques et des marchés. Rigoureux, organisé, avec une solide connaissance des procédures administratives et des textes réglementaires en vigueur.',
+  sante:'Professionnel(le) de santé engagé(e) dans l\'amélioration de la santé communautaire. Compétences cliniques solides et expérience terrain en zones à ressources limitées, en coordination avec les acteurs institutionnels et les organisations internationales.',
+  education:'Formateur(trice) et pédagogue expérimenté(e), spécialisé(e) dans l\'ingénierie de formation et la transmission de savoirs complexes. Engagement fort pour l\'innovation pédagogique et le développement des compétences.',
+  commerce:'Commercial(e) orienté(e) résultats avec une forte capacité à développer et fidéliser un portefeuille clients dans un environnement compétitif B2B en Afrique de l\'Ouest.',
+  agriculture:'Agronome terrain avec une expertise solide dans l\'accompagnement des acteurs agricoles et le développement des chaînes de valeur. Capacité à concilier impératifs techniques, économiques et environnementaux.',
+  autre:'Professionnel(le) polyvalent(e) avec une solide expérience et une capacité démontrée à s\'adapter à des environnements complexes. Orienté(e) résultats, rigoureux(se) et doté(e) d\'excellentes compétences relationnelles.',
+};
+const AI_PROMPTS={
+  ong:"Reformule ce profil professionnel avec un ton orienté impact social. Utilise le vocabulaire des bailleurs de fonds internationaux : résultats mesurables, bénéficiaires, indicateurs, renforcement des capacités. Sobre, factuel, 3-4 lignes maximum.",
+  banque:"Reformule avec un ton professionnel et précis. Mets en avant les chiffres, les performances, le vocabulaire réglementaire : conformité, risque, portefeuille, rendement. 3-4 lignes maximum.",
+  tech:"Reformule avec un ton dynamique et moderne. Focus sur les réalisations techniques concrètes : projets livrés, technologies maîtrisées, impact produit, méthodologies. 3-4 lignes.",
+  admin:"Reformule avec un ton formel et institutionnel. Vocabulaire juridico-administratif. Hiérarchique, structuré. 3-4 lignes.",
+  sante:"Reformule avec un ton rigoureux et humain. Focus sur les compétences cliniques, l'engagement terrain, les protocoles respectés. 3-4 lignes.",
+  education:"Reformule avec un ton académique et pédagogique. Résultats sur les apprenants, projets éducatifs, méthodologies. 3-4 lignes.",
+  commerce:"Reformule avec un ton orienté résultats commerciaux. Chiffres de vente, développement marché, leadership terrain, croissance du portefeuille. 3-4 lignes.",
+  agriculture:"Reformule avec un ton technique et terrain. Rendements obtenus, certifications, impact sur les agriculteurs, filières développées. 3-4 lignes.",
+  autre:"Reformule ce profil professionnel de manière concise et percutante. Mets en avant les points forts et la valeur ajoutée. 3-4 lignes maximum.",
+};
+const EXAMPLES={
+  ong:{first:'Fatoumata',last:'Diallo',job:'Chargée de Programme Développement Rural',loc:'Dakar, Sénégal',email:'f.diallo@care.org',phone:'70123456',ind:'+221',sum:'Professionnelle du développement avec 5 ans d\'expérience en gestion de projets financés par l\'UE et l\'USAID au Sahel. Spécialisée en suivi-évaluation et mobilisation communautaire.',exps:[{title:'Coordinatrice Terrain',org:'CARE International',city:'Dakar',period:'2021 – présent',desc:'Coordination de 12 projets dans 3 régions. Reporting mensuel aux bailleurs. Supervision d\'une équipe de 8 agents terrain.'}],edus:[{deg:'Master Développement International',school:'Université Cheikh Anta Diop',year:'2020',mention:'Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Anglais',level:'Courant'},{lang:'Wolof',level:'Courant'}],skills:['Gestion de projet','Suivi-évaluation (S&E)','KOBO/ODK','Logframe','Budget & Reporting bailleur']},
+  banque:{first:'Kwame',last:'Asante',job:'Analyste Crédit Senior',loc:'Accra, Ghana',email:'kwame.asante@ecobank.com',phone:'244123456',ind:'+233',sum:'Analyste financier certifié OHADA avec 6 ans d\'expérience en analyse de risques crédit PME dans le secteur bancaire ouest-africain.',exps:[{title:'Analyste Crédit',org:'Ecobank Ghana',city:'Accra',period:'2020 – présent',desc:'Analyse du portefeuille PME. Taux de recouvrement maintenu à 94%. Supervision de 3 juniors.'}],edus:[{deg:'Licence Comptabilité-Finance',school:'University of Ghana',year:'2018',mention:'Second Class Upper'}],langs:[{lang:'Anglais',level:'Langue maternelle'},{lang:'Français',level:'Intermédiaire'},{lang:'Twi',level:'Courant'}],skills:['Analyse financière','OHADA','IFRS','Excel avancé','Audit interne','Gestion des risques']},
+  tech:{first:'Adeola',last:'Okonkwo',job:'Développeur Full Stack',loc:'Lagos, Nigeria',email:'adeola@flutterwave.com',phone:'8012345678',ind:'+234',sum:'Développeur passionné avec 3 ans d\'expérience en développement d\'applications web et mobile pour des startups fintech nigérianes.',exps:[{title:'Développeur Frontend',org:'Flutterwave',city:'Lagos',period:'2022 – présent',desc:'Développement de composants React pour le tableau de bord marchand. +100 000 utilisateurs actifs.'}],edus:[{deg:'B.Sc. Computer Science',school:'University of Lagos',year:'2021',mention:'First Class'}],langs:[{lang:'Anglais',level:'Langue maternelle'},{lang:'Français',level:'Débutant'},{lang:'Yoruba',level:'Courant'}],skills:['JavaScript','React','Node.js','API REST','Git','SQL']},
+  admin:{first:'Kossi',last:'Agbénou',job:'Inspecteur des Finances Publiques',loc:'Lomé, Togo',email:'k.agbenou@finances.tg',phone:'90567890',ind:'+228',sum:'Fonctionnaire avec 8 ans d\'expérience en contrôle budgétaire et marchés publics au sein du Ministère des Finances du Togo.',exps:[{title:'Chef de section Budget',org:'MEF Togo',city:'Lomé',period:'2018 – présent',desc:'Supervision du contrôle d\'exécution du budget. Gestion d\'une équipe de 6 agents. Référent SIGFIP.'}],edus:[{deg:'ENAM — Administration Générale',school:'ENAM Lomé',year:'2016',mention:'Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Anglais',level:'Intermédiaire'},{lang:'Éwé',level:'Courant'}],skills:['Marchés publics','Droit administratif','SIGFIP','Rédaction administrative','Contrôle interne']},
+  sante:{first:'Aïssatou',last:'Bah',job:'Médecin Généraliste / Santé Publique',loc:'Conakry, Guinée',email:'aissatou.bah@sante.gn',phone:'621234567',ind:'+224',sum:'Médecin engagée dans la santé communautaire avec 4 ans d\'expérience en zones rurales et coordination avec les acteurs OMS/UNICEF.',exps:[{title:'Médecin Chef CSP',org:'Ministère de la Santé Guinée',city:'Kindia',period:'2021 – présent',desc:'Supervision médicale de 3 centres de santé. 45 000 habitants couverts. Formation mensuelle des agents de santé.'}],edus:[{deg:'Doctorat en Médecine',school:'Université Gamal Abdel Nasser',year:'2020',mention:'Très Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Pular',level:'Courant'},{lang:'Anglais',level:'Intermédiaire'}],skills:['Soins aux patients','Santé publique','SONU','PTME','Standards OMS','Épidémiologie']},
+  education:{first:'Moussa',last:'Coulibaly',job:'Formateur en Sciences de l\'Education',loc:'Abidjan, Côte d\'Ivoire',email:'m.coulibaly@cafop.ci',phone:'712345678',ind:'+225',sum:'Enseignant-chercheur avec 7 ans d\'expérience en conception pédagogique et formation professionnelle des adultes en Côte d\'Ivoire.',exps:[{title:'Formateur Senior',org:'CAFOP Abidjan',city:'Abidjan',period:'2019 – présent',desc:'Formation de 200 enseignants/an. Conception de modules e-learning. Évaluation des apprentissages.'}],edus:[{deg:'Master Sciences de l\'Education',school:'Université FHB',year:'2018',mention:'Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Dioula',level:'Courant'},{lang:'Anglais',level:'Intermédiaire'}],skills:['Pédagogie active','Conception curricula','E-learning','TICE','Évaluation des apprentissages']},
+  commerce:{first:'Aminata',last:'Koné',job:'Responsable Commercial Export',loc:'Abidjan, Côte d\'Ivoire',email:'a.kone@cfao.ci',phone:'707654321',ind:'+225',sum:'Commerciale dynamique avec 5 ans d\'expérience en développement de marchés B2B en Afrique de l\'Ouest pour des produits agroalimentaires.',exps:[{title:'Chef de Zone Export',org:'CFAO Foods',city:'Abidjan',period:'2020 – présent',desc:'Développement export vers 5 pays. +35% de CA en 2 ans. Management d\'une équipe de 4 commerciaux terrain.'}],edus:[{deg:'BTS Commerce International',school:'ISTC Abidjan',year:'2019',mention:'Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Anglais',level:'Courant'},{lang:'Bambara',level:'Courant'}],skills:['Négociation commerciale','Supply chain','CRM','Import/Export','Incoterms','SAP']},
+  agriculture:{first:'Bassirou',last:'Sawadogo',job:'Agronome / Responsable Chaîne de Valeur',loc:'Bobo-Dioulasso, Burkina Faso',email:'b.sawadogo@sofitex.bf',phone:'70234567',ind:'+226',sum:'Agronome de terrain avec 6 ans d\'expérience en appui aux coopératives cotonnières et certification des filières au Burkina Faso.',exps:[{title:'Conseiller Agricole',org:'SOFITEX',city:'Bobo-Dioulasso',period:'2019 – présent',desc:'Encadrement de 1 200 producteurs. Amélioration du rendement moyen de 18%. Certification GlobalGAP de 3 coopératives.'}],edus:[{deg:'Ingénieur Agronome',school:'IDR/Université Nazi Boni',year:'2018',mention:'Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Dioula',level:'Courant'},{lang:'Mooré',level:'Courant'}],skills:['Agronomie','BPA','Certification GlobalGAP','Coopératives','SIG/Cartographie']},
+  autre:{first:'Jean-Marc',last:'Adebiyi',job:'Responsable Administratif et Financier',loc:'Cotonou, Bénin',email:'jm.adebiyi@gmail.com',phone:'97123456',ind:'+229',sum:'Cadre administratif et financier avec 6 ans d\'expérience dans la gestion d\'entreprises au Bénin et au Togo. Polyvalent, rigoureux et orienté résultats.',exps:[{title:'Responsable Administratif',org:'Groupe SNAEM',city:'Cotonou',period:'2020 – présent',desc:'Supervision administrative, comptable et RH de l\'ensemble du groupe. Optimisation des coûts de 12%.'}],edus:[{deg:'Master Gestion des Entreprises',school:'Université d\'Abomey-Calavi',year:'2018',mention:'Bien'}],langs:[{lang:'Français',level:'Langue maternelle'},{lang:'Anglais',level:'Intermédiaire'},{lang:'Fon',level:'Courant'}],skills:['Gestion de projet','Excel','Microsoft Office','Leadership','Rédaction professionnelle']},
+};
+
+// ═══════════════════════════════════
+// TEMPLATES CONFIG
+// ═══════════════════════════════════
+const TMPLS={
+  simple:[
+    {id:'S1',label:'Classique',font:'Georgia,serif'},
+    {id:'S2',label:'Moderne',font:"'DM Sans',sans-serif"},
+    {id:'S3',label:'Académique',font:"'Libre Baskerville',serif"},
+    {id:'S4',label:'Tech',font:"'Oswald',sans-serif"},
+    {id:'S5',label:'Élégant',font:"'Cormorant Garamond',serif"},
+  ],
+  pro:[
+    {id:'T1',label:'Bleu Marine'},
+    {id:'T2',label:'Vert Forêt'},
+    {id:'T3',label:'Bordeaux'},
+    {id:'T4',label:'Anthracite'},
+    {id:'T5',label:'Bleu Nuit'},
+  ],
+  premium:[
+    {id:'P1',label:'Ambre/Nuit'},
+    {id:'P2',label:'Émeraude'},
+    {id:'P3',label:'Rubis'},
+    {id:'P4',label:'Gris/Perle'},
+    {id:'P5',label:'Or Brûlé'},
+    {id:'P6',label:'Océan'},
+    {id:'P7',label:'Violet'},
+    {id:'P8',label:'Ardoise'},
+  ],
+};
+const FONTS={
+  pro:["'DM Sans',sans-serif","'Lora',serif"],
+  premium:["'DM Sans',sans-serif","'Lora',serif","'Cormorant Garamond',serif","'Oswald',sans-serif","'Libre Baskerville',serif"],
+};
+
+// ═══════════════════════════════════
+// PLAN SELECTION
+// ═══════════════════════════════════
+function selectPlan(plan){
+  S.plan=plan;
+  ['simple','pro','premium'].forEach(p=>{
+    document.getElementById('ps-'+p)?.classList.toggle('on',p===plan);
+  });
+  document.getElementById('fh-tag').textContent=PLANS[plan].label;
+  document.getElementById('sticky-plan-info').textContent=PLANS[plan].label+' — '+PLANS[plan].amt.toLocaleString()+' FCFA';
+  // Template default
+  S.tmpl=0;
+  buildTmplGrid();
+  buildFontPills();
+  buildGradRow();
+  showPage('page-form');
+  renderCV();
+}
+
+function buildTmplGrid(){
+  const g=document.getElementById('tmpl-grid');if(!g)return;
+  const list=TMPLS[S.plan]||TMPLS.simple;
+  g.innerHTML='';
+  list.forEach((tm,i)=>{
+    const d=document.createElement('div');
+    d.className='tc'+(S.tmpl===i?' on':'');
+    // Mini preview
+    const preview=buildMiniPreview(S.plan,tm);
+    d.innerHTML=preview+`<div class="tc-lb">${tm.label}</div>`;
+    d.onclick=()=>{S.tmpl=i;document.querySelectorAll('.tc').forEach(x=>x.classList.remove('on'));d.classList.add('on');renderCV();};
+    g.appendChild(d);
+  });
+}
+
+function buildMiniPreview(plan,tm){
+  if(plan==='simple') return `<div style="width:100%;height:100%;background:#fff;padding:5px"><div style="height:14px;background:#111;margin-bottom:4px;opacity:.08;border-radius:1px"></div><div style="height:3px;background:#ccc;margin-bottom:3px;width:85%;border-radius:1px"></div><div style="height:3px;background:#eee;margin-bottom:3px;width:70%;border-radius:1px"></div><div style="height:3px;background:#eee;width:80%;border-radius:1px"></div></div>`;
+  const colors={'T1':'#183868','T2':'#1E5C3A','T3':'#621428','T4':'#1A1915','T5':'#2C3E50'};
+  const pcolors={'P1':'#162038','P2':'#0A2E1A','P3':'#26080C','P4':'#181820','P5':'#2E1E0C','P6':'#0C263C','P7':'#1C1630','P8':'#162028'};
+  const c=colors[tm.id]||pcolors[tm.id]||'#183868';
+  if(plan==='pro') return `<div style="width:100%;height:100%;display:flex"><div style="width:35%;background:${c}"></div><div style="flex:1;background:#fff;padding:4px"><div style="height:8px;background:${c};margin-bottom:3px;border-radius:1px;opacity:.2"></div><div style="height:2px;background:#eee;margin-bottom:2px;width:90%;border-radius:1px"></div><div style="height:2px;background:#eee;width:75%;border-radius:1px"></div></div></div>`;
+  return `<div style="width:100%;height:100%;background:#fff"><div style="height:25%;background:${c}"></div><div style="padding:4px"><div style="height:2px;background:#eee;margin-bottom:2px;width:85%;border-radius:1px"></div><div style="height:2px;background:#eee;width:70%;border-radius:1px"></div></div></div>`;
+}
+
+function buildFontPills(){
+  const fb=document.getElementById('font-blk');
+  const fp=document.getElementById('font-pills');
+  if(!fb||!fp)return;
+  const show=S.plan==='pro'||S.plan==='premium';
+  fb.style.display=show?'':'none';
+  if(!show)return;
+  const list=FONTS[S.plan]||FONTS.pro;
+  fp.innerHTML='';
+  list.forEach((f,i)=>{
+    const names=['DM Sans','Lora','Cormorant','Oswald','Baskerville'];
+    const b=document.createElement('button');
+    b.className='fp2'+(S.font===f?' on':'');
+    b.textContent=names[i]||f.split(',')[0].replace(/'/g,'');
+    b.style.fontFamily=f;
+    b.onclick=()=>{S.font=f;document.querySelectorAll('.fp2').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderCV();};
+    fp.appendChild(b);
+  });
+}
+
+function buildGradRow(){
+  const gb=document.getElementById('grad-blk');
+  const gr=document.getElementById('grad-row');
+  if(!gb||!gr)return;
+  gb.style.display=S.plan==='premium'?'':'none';
+  if(S.plan!=='premium')return;
+  const grads=[
+    ['#C49438','#7A4E0E'],['#30885C','#08401E'],['#B42C3A','#680A14'],
+    ['#A0A0C8','#404060'],['#C87818','#7A4206'],['#248ABC','#083C5C'],
+    ['#7E4CCC','#361070'],['#388CA2','#103C50'],
+  ];
+  gr.innerHTML='';
+  grads.forEach(([a,b],i)=>{
+    const d=document.createElement('div');
+    d.className='gp'+(S.grad===i?' on':'');
+    d.style.background=`linear-gradient(135deg,${a},${b})`;
+    d.onclick=()=>{S.grad=i;document.querySelectorAll('.gp').forEach(x=>x.classList.remove('on'));d.classList.add('on');renderCV();};
+    gr.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════
+// SECTOR CHANGE
+// ═══════════════════════════════════
+function onSectorChange(){
+  const sec=document.getElementById('f-secteur').value;
+  const tags=SECTOR_SKILLS[sec]||[];
+  const cont=document.getElementById('sk-suggested');
+  cont.innerHTML='';
+  tags.forEach(sk=>{
+    const el=document.createElement('div');
+    el.className='sk-tag'+(S.selSkills.includes(sk)?' on':'');
+    el.textContent=sk;
+    el.onclick=()=>toggleSugSkill(sk,el);
+    cont.appendChild(el);
+  });
+  scheduleLiveUpdate();
+}
+function toggleSugSkill(sk,el){
+  if(S.selSkills.includes(sk)){S.selSkills=S.selSkills.filter(x=>x!==sk);el.classList.remove('on');}
+  else{S.selSkills.push(sk);el.classList.add('on');}
+  scheduleLiveUpdate();
+}
+
+// ═══════════════════════════════════
+// FILL EXAMPLE
+// ═══════════════════════════════════
+function fillExample(){
+  const sec=document.getElementById('f-secteur').value||'ong';
+  const ex=EXAMPLES[sec]||EXAMPLES.ong;
+  document.getElementById('f-first').value=ex.first;
+  document.getElementById('f-last').value=ex.last;
+  document.getElementById('f-job').value=ex.job;
+  document.getElementById('f-loc').value=ex.loc;
+  document.getElementById('f-email').value=ex.email;
+  document.getElementById('f-phone').value=ex.phone;
+  document.getElementById('f-indicatif').value=ex.ind;
+  document.getElementById('f-sum').value=ex.sum;
+  // Exps
+  document.getElementById('exp-list').innerHTML='';S.exps=[];
+  ex.exps.forEach(e=>addExp(e));
+  // Edus
+  document.getElementById('edu-list').innerHTML='';S.edus=[];
+  ex.edus.forEach(e=>addEdu(e));
+  // Langs
+  document.getElementById('lang-list').innerHTML='';S.langs=[];
+  ex.langs.forEach(l=>addLang(l));
+  // Skills — set suggested
+  S.selSkills=[...ex.skills];
+  onSectorChange();
+  scheduleLiveUpdate();
+  toast('✓ Exemple chargé !','var(--forest)');
+}
+
+// ═══════════════════════════════════
+// DYNAMIC ITEMS — EXP / EDU / SKILLS / LANGS
+// ═══════════════════════════════════
+let expCnt=0,eduCnt=0,skCnt=0,lnCnt=0;
+
+function addExp(data={}){
+  expCnt++;const id='exp'+expCnt;
+  S.exps.push({id});
+  const div=document.createElement('div');div.className='di';div.id=id;
+  div.innerHTML=`<div class="di-hd"><div class="di-t">Expérience ${S.exps.length}</div><button class="di-rm" onclick="removeItem('${id}','exps')">Supprimer</button></div>
+    <div class="g2"><div class="fld"><label>Titre du poste</label><input type="text" id="${id}-t" value="${esc(data.title||'')}" placeholder="Responsable Comptable" oninput="scheduleLiveUpdate()"></div>
+    <div class="fld"><label>Organisation</label><input type="text" id="${id}-o" value="${esc(data.org||'')}" placeholder="Groupe ABC" oninput="scheduleLiveUpdate()"></div></div>
+    <div class="g2"><div class="fld"><label>Ville</label><input type="text" id="${id}-c" value="${esc(data.city||'')}" placeholder="Lomé" oninput="scheduleLiveUpdate()"></div>
+    <div class="fld"><label>Période</label><input type="text" id="${id}-p" value="${esc(data.period||'')}" placeholder="2020 – présent" oninput="scheduleLiveUpdate()"></div></div>
+    <div class="fld"><label>Description</label><textarea id="${id}-d" rows="2" placeholder="Responsabilités, réalisations clés..." oninput="scheduleLiveUpdate()">${esc(data.desc||'')}</textarea></div>`;
+  document.getElementById('exp-list').appendChild(div);
+  scheduleLiveUpdate();
+}
+function addEdu(data={}){
+  eduCnt++;const id='edu'+eduCnt;
+  S.edus.push({id});
+  const div=document.createElement('div');div.className='di';div.id=id;
+  div.innerHTML=`<div class="di-hd"><div class="di-t">Formation ${S.edus.length}</div><button class="di-rm" onclick="removeItem('${id}','edus')">Supprimer</button></div>
+    <div class="g2"><div class="fld"><label>Diplôme / Titre</label><input type="text" id="${id}-deg" value="${esc(data.deg||'')}" placeholder="Master Finance" oninput="scheduleLiveUpdate()"></div>
+    <div class="fld"><label>École / Université</label><input type="text" id="${id}-sch" value="${esc(data.school||'')}" placeholder="Université de Lomé" oninput="scheduleLiveUpdate()"></div></div>
+    <div class="g2"><div class="fld"><label>Année</label><input type="text" id="${id}-yr" value="${esc(data.year||'')}" placeholder="2022" oninput="scheduleLiveUpdate()"></div>
+    <div class="fld"><label>Mention</label><input type="text" id="${id}-mn" value="${esc(data.mention||'')}" placeholder="Bien / Très Bien" oninput="scheduleLiveUpdate()"></div></div>`;
+  document.getElementById('edu-list').appendChild(div);
+  scheduleLiveUpdate();
+}
+function addSkill(data={}){
+  skCnt++;const id='sk'+skCnt;
+  S.skills.push({id});
+  const div=document.createElement('div');div.className='di';div.id=id;
+  div.innerHTML=`<div class="di-hd"><div class="di-t">Compétence</div><button class="di-rm" onclick="removeItem('${id}','skills')">Supprimer</button></div>
+    <div class="g2"><div class="fld"><label>Compétence</label><input type="text" id="${id}-n" value="${esc(data.name||'')}" placeholder="SAP FICO" oninput="scheduleLiveUpdate()"></div>
+    <div class="fld"><label>Niveau (1–5)</label><div class="sk-lvl" id="${id}-lv">${[1,2,3,4,5].map(i=>`<div class="sk-dot${(data.level||3)>=i?' on':''}" onclick="setSkLevel('${id}',${i})"></div>`).join('')}</div></div></div>`;
+  document.getElementById('skill-list').appendChild(div);
+  S.skills[S.skills.length-1].level=data.level||3;
+  scheduleLiveUpdate();
+}
+function setSkLevel(id,lv){
+  const idx=S.skills.findIndex(s=>s.id===id);if(idx>=0)S.skills[idx].level=lv;
+  document.querySelectorAll(`#${id}-lv .sk-dot`).forEach((d,i)=>d.classList.toggle('on',i<lv));
+  scheduleLiveUpdate();
+}
+function addLang(data={}){
+  lnCnt++;const id='ln'+lnCnt;
+  S.langs.push({id});
+  const div=document.createElement('div');div.className='di';div.id=id;
+  const levels=['Débutant','Intermédiaire','Courant','Bilingue','Langue maternelle'];
+  div.innerHTML=`<div class="di-hd"><div class="di-t">Langue</div><button class="di-rm" onclick="removeItem('${id}','langs')">Supprimer</button></div>
+    <div class="g2"><div class="fld"><label>Langue</label><input type="text" id="${id}-l" value="${esc(data.lang||'')}" placeholder="Français" oninput="scheduleLiveUpdate()"></div>
+    <div class="fld"><label>Niveau</label><select id="${id}-lv" onchange="scheduleLiveUpdate()">${levels.map(l=>`<option${data.level===l?' selected':''}>${l}</option>`).join('')}</select></div></div>`;
+  document.getElementById('lang-list').appendChild(div);
+  scheduleLiveUpdate();
+}
+function removeItem(id,arr){
+  S[arr]=S[arr].filter(x=>x.id!==id);
+  document.getElementById(id)?.remove();
+  scheduleLiveUpdate();
+}
+
+// ═══════════════════════════════════
+// PHOTO
+// ═══════════════════════════════════
+function onPhoto(inp){
+  if(!inp.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{S.photo=e.target.result;document.getElementById('photo-zone').style.display='none';const pv=document.getElementById('photo-prev');pv.style.display='flex';document.getElementById('photo-img').src=S.photo;renderCV();};
+  r.readAsDataURL(inp.files[0]);
+}
+function clearPhoto(e){e.stopPropagation();S.photo=null;document.getElementById('photo-zone').style.display='';document.getElementById('photo-prev').style.display='none';document.getElementById('photo-in').value='';renderCV();}
+
+// ═══════════════════════════════════
+// AI REWRITE
+// ═══════════════════════════════════
+async function rewriteWithAI(){
+  const txt=document.getElementById('f-sum').value.trim();
+  if(!txt){toast('Écris d\'abord ton profil professionnel','#c0392b');return;}
+  const sec=document.getElementById('f-secteur').value||'autre';
+  const spin=document.getElementById('ai-spin');
+  const lbl=document.getElementById('ai-txt');
+  spin.style.display='block';lbl.textContent='Reformulation en cours…';
+  try{
+    const sysPrompt=AI_PROMPTS[sec]||AI_PROMPTS.autre;
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,
+        system:sysPrompt+' Réponds UNIQUEMENT avec le texte reformulé, sans guillemets ni commentaires.',
+        messages:[{role:'user',content:txt}]})
     });
-  });
+    if(resp.ok){
+      const d=await resp.json();
+      const newTxt=d.content?.[0]?.text?.trim();
+      if(newTxt){document.getElementById('f-sum').value=newTxt;scheduleLiveUpdate();toast('✓ Profil reformulé par l\'IA','var(--forest)');}
+      else throw new Error('empty');
+    } else throw new Error('api');
+  }catch(err){
+    document.getElementById('f-sum').value=AI_FALLBACK[sec]||AI_FALLBACK.autre;
+    scheduleLiveUpdate();toast('✓ Suggestion appliquée (mode hors-ligne)','var(--amber)');
+  } finally{spin.style.display='none';lbl.textContent='';}
+}
 
-  // Photo preview
-  function previewPhoto(input) {
-    const preview = document.getElementById('photo-preview');
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        preview.src = e.target.result;
-        preview.style.display = 'block';
-        document.querySelector('.photo-upload-icon').textContent = '✅';
-        document.querySelector('.photo-upload p').textContent = input.files[0].name;
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
+// ═══════════════════════════════════
+// COLLECT FORM DATA
+// ═══════════════════════════════════
+function getFormData(){
+  const exps=[];
+  S.exps.forEach(({id})=>{
+    const t=document.getElementById(id+'-t')?.value||'';
+    if(!t)return;
+    exps.push({title:t,org:document.getElementById(id+'-o')?.value||'',city:document.getElementById(id+'-c')?.value||'',period:document.getElementById(id+'-p')?.value||'',desc:document.getElementById(id+'-d')?.value||''});
+  });
+  const edus=[];
+  S.edus.forEach(({id})=>{
+    const d=document.getElementById(id+'-deg')?.value||'';
+    if(!d)return;
+    edus.push({deg:d,school:document.getElementById(id+'-sch')?.value||'',year:document.getElementById(id+'-yr')?.value||'',mention:document.getElementById(id+'-mn')?.value||''});
+  });
+  const skills=[...S.selSkills];
+  S.skills.forEach(({id,level})=>{const n=document.getElementById(id+'-n')?.value||'';if(n&&!skills.includes(n))skills.push(n);});
+  const langs=[];
+  S.langs.forEach(({id})=>{const l=document.getElementById(id+'-l')?.value||'';if(l)langs.push({lang:l,level:document.getElementById(id+'-lv')?.value||'Courant'});});
+  return{
+    first:document.getElementById('f-first')?.value||'',
+    last:document.getElementById('f-last')?.value||'',
+    job:document.getElementById('f-job')?.value||'',
+    email:document.getElementById('f-email')?.value||'',
+    phone:(document.getElementById('f-indicatif')?.value||'+228')+' '+(document.getElementById('f-phone')?.value||''),
+    loc:document.getElementById('f-loc')?.value||'',
+    li:document.getElementById('f-li')?.value||'',
+    sum:document.getElementById('f-sum')?.value||'',
+    interests:document.getElementById('f-int')?.value||'',
+    exps,edus,skills,langs,
+    plan:S.plan,tmpl:S.tmpl,font:S.font,grad:S.grad,photo:S.photo,
+  };
+}
+
+// ═══════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════
+function updateProgress(){
+  const d=getFormData();
+  let n=0,tot=6;
+  if(d.first&&d.last)n++;if(d.job)n++;if(d.email)n++;if(d.sum)n++;if(d.exps.length)n++;if(d.edus.length)n++;
+  const pct=Math.round(n/tot*100);
+  const pb=document.getElementById('prog-b');if(pb)pb.style.width=pct+'%';
+}
+
+// ═══════════════════════════════════
+// VALIDATION
+// ═══════════════════════════════════
+function validateForm(){
+  let ok=true;
+  const checks=[
+    {id:'fld-first',val:()=>document.getElementById('f-first')?.value.trim()},
+    {id:'fld-last',val:()=>document.getElementById('f-last')?.value.trim()},
+    {id:'fld-job',val:()=>document.getElementById('f-job')?.value.trim()},
+    {id:'fld-email',val:()=>{const v=document.getElementById('f-email')?.value.trim();return v&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)?v:'';}},
+  ];
+  checks.forEach(c=>{
+    const el=document.getElementById(c.id);if(!el)return;
+    if(!c.val()){el.classList.add('err');ok=false;}
+    else el.classList.remove('err');
+  });
+  return ok;
+}
+
+// ═══════════════════════════════════
+// GENERATE (form → preview)
+// ═══════════════════════════════════
+function doGenerate(){
+  if(!validateForm()){toast('Remplis les champs obligatoires (*)','#c0392b');const el=document.getElementById('fld-first');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});}return;}
+  renderCV(true);
+  showPage('page-preview');
+  const d=getFormData();
+  document.getElementById('order-plan-name').textContent=PLANS[d.plan].label;
+  document.getElementById('order-plan-price').textContent=PLANS[d.plan].amt.toLocaleString()+' FCFA';
+  startTimer();
+}
+
+// ═══════════════════════════════════
+// TIMER
+// ═══════════════════════════════════
+function startTimer(){
+  stopTimer();
+  const timerEnabled=document.getElementById('tog-timer')?.checked!==false;
+  if(!timerEnabled)return;
+  let secs=60;
+  document.getElementById('timer-txt').textContent='01:00';
+  timerInt=setInterval(()=>{
+    secs--;
+    const m=Math.floor(secs/60),s=secs%60;
+    document.getElementById('timer-txt').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(secs<=0){stopTimer();showBlur();}
+  },1000);
+}
+function stopTimer(){clearInterval(timerInt);timerInt=null;}
+function showBlur(){const g=document.getElementById('blur-gate');if(g)g.classList.add('show');}
+function hideBlur(){const g=document.getElementById('blur-gate');if(g)g.classList.remove('show');}
+
+// ═══════════════════════════════════
+// LIVE PREVIEW
+// ═══════════════════════════════════
+function scheduleLiveUpdate(){clearTimeout(liveDebounce);liveDebounce=setTimeout(()=>{updateProgress();renderCV();},350);}
+function renderCV(force=false){
+  const d=getFormData();
+  const html=buildCVHTML(d);
+  const targets=['cv-paper'];
+  targets.forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+}
+
+// ═══════════════════════════════════
+// CV HTML BUILDER
+// ═══════════════════════════════════
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');}
+function buildCVHTML(d){
+  if(d.plan==='premium')return buildPrem(d);
+  if(d.plan==='pro')return buildPro(d);
+  return buildSimple(d);
+}
+
+function buildSimple(d){
+  const tmList=TMPLS.simple;const tm=tmList[d.tmpl]||tmList[0];
+  const font=tm.font;
+  const fullName=((d.first||'Prénom')+' '+(d.last||'Nom')).toUpperCase();
+  const initials=((d.first||'?')[0]+(d.last||'?')[0]).toUpperCase();
+  return `<div class="cv-simple" style="font-family:${font}"><div class="cvs-wrap">
+    <div class="cvs-hd">
+      <div class="cvs-avph">${d.photo?`<img src="${d.photo}">`:`<span>${initials}</span>`}</div>
+      <div style="flex:1">
+        <div class="cvs-name" style="font-family:${font}">${fullName}</div>
+        ${d.job?`<div class="cvs-title">${esc(d.job)}</div>`:''}
+        <div class="cvs-contacts">${[d.email&&`✉ ${esc(d.email)}`,d.phone&&`☏ ${esc(d.phone)}`,d.loc&&`⌖ ${esc(d.loc)}`,d.li&&`🔗 ${esc(d.li)}`].filter(Boolean).join('<span style="opacity:.3;margin:0 4px">·</span>')}</div>
+      </div>
+    </div>
+    ${d.sum?`<div class="cvs-sec"><div class="cvs-sh">${t('cv_profile')}</div><div class="cvs-sum">${esc(d.sum)}</div></div>`:''}
+    ${d.exps.length?`<div class="cvs-sec"><div class="cvs-sh">${t('cv_exp')}</div>${d.exps.map(e=>`<div class="cvs-item"><div class="cvs-item-hd"><span class="cvs-item-t">${esc(e.title)}</span><span class="cvs-item-d">${esc(e.period)}</span></div><div class="cvs-item-s">${[e.org,e.city].filter(Boolean).map(esc).join(' — ')}</div>${e.desc?`<div class="cvs-item-desc">${esc(e.desc)}</div>`:''}</div>`).join('')}</div>`:''}
+    <div class="cvs-2col">
+      ${d.edus.length?`<div class="cvs-sec"><div class="cvs-sh">${t('cv_edu')}</div>${d.edus.map(e=>`<div class="cvs-item"><div class="cvs-item-hd"><span class="cvs-item-t">${esc(e.deg)}</span><span class="cvs-item-d">${esc(e.year)}</span></div><div class="cvs-item-s">${[e.school,e.mention].filter(Boolean).map(esc).join(' · ')}</div></div>`).join('')}</div>`:''}
+      ${d.skills.length?`<div class="cvs-sec"><div class="cvs-sh">${t('cv_skills')}</div><div class="cvs-tags">${d.skills.map(s=>`<span class="cvs-tag">${esc(s)}</span>`).join('')}</div></div>`:''}
+    </div>
+    ${d.langs.length?`<div class="cvs-sec"><div class="cvs-sh">${t('cv_langs')}</div><div class="cvs-2col">${d.langs.map(l=>`<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0;border-bottom:1px solid #f0f0f0"><span>${esc(l.lang)}</span><span style="color:#888">${esc(l.level)}</span></div>`).join('')}</div></div>`:''}
+    ${d.interests?`<div class="cvs-sec"><div class="cvs-sh">${t('cv_interests')}</div><div class="cvs-sum">${esc(d.interests)}</div></div>`:''}
+  </div></div>`;
+}
+
+function buildPro(d){
+  const tmList=TMPLS.pro;const tm=tmList[d.tmpl]||tmList[0];
+  const cls='cv-pro '+tm.id;
+  const fullName=((d.first||'Prénom')+' '+(d.last||'Nom'));
+  const initials=((d.first||'?')[0]+(d.last||'?')[0]).toUpperCase();
+  const font=d.font||"'DM Sans',sans-serif";
+  const colors={'T1':'#183868','T2':'#1E5C3A','T3':'#621428','T4':'#333','T5':'#2C3E50'};
+  const ac=colors[tm.id]||'#183868';
+  const sbSk=d.skills.slice(0,8);
+  return `<div class="${cls}" style="font-family:${font}">
+    <div class="pro-sb">
+      <div class="pro-sb-avph">${d.photo?`<img src="${d.photo}">`:`<span>${initials}</span>`}</div>
+      <div class="pro-sb-name" style="font-family:${font}">${esc(fullName)}</div>
+      ${d.job?`<div class="pro-sb-title">${esc(d.job)}</div>`:''}
+      <div class="pro-sb-sec"><div class="pro-sb-sh">Contact</div>
+        ${d.email?`<div class="pro-sb-it"><span class="pro-sb-ic">✉</span>${esc(d.email)}</div>`:''}
+        ${d.phone?`<div class="pro-sb-it"><span class="pro-sb-ic">☏</span>${esc(d.phone)}</div>`:''}
+        ${d.loc?`<div class="pro-sb-it"><span class="pro-sb-ic">⌖</span>${esc(d.loc)}</div>`:''}
+        ${d.li?`<div class="pro-sb-it"><span class="pro-sb-ic">🔗</span>${esc(d.li)}</div>`:''}
+      </div>
+      ${sbSk.length?`<div class="pro-sb-sec"><div class="pro-sb-sh">${t('cv_skills')}</div>${sbSk.map(s=>`<div class="pro-sk-it"><div class="pro-sk-n">${esc(s)}</div><div class="pro-sk-bg"><div class="pro-sk-f" style="width:${65+Math.random()*30|0}%"></div></div></div>`).join('')}</div>`:''}
+      ${d.langs.length?`<div class="pro-sb-sec"><div class="pro-sb-sh">${t('cv_langs')}</div>${d.langs.map(l=>`<div class="pro-lang-it"><span>${esc(l.lang)}</span><span>${esc(l.level)}</span></div>`).join('')}</div>`:''}
+    </div>
+    <div class="pro-main">
+      <div class="pro-hd" style="border-color:${ac}">
+        <div class="pro-hd-n" style="font-family:${font}">${esc(fullName)}</div>
+        ${d.job?`<div class="pro-hd-t">${esc(d.job)}</div>`:''}
+      </div>
+      <div class="pro-body">
+        ${d.sum?`<div class="pro-sec"><div class="pro-sec-h" style="border-color:${ac};color:${ac}">${t('cv_profile')}</div><div class="pro-sum">${esc(d.sum)}</div></div>`:''}
+        ${d.exps.length?`<div class="pro-sec"><div class="pro-sec-h" style="border-color:${ac};color:${ac}">${t('cv_exp')}</div>${d.exps.map(e=>`<div class="pro-it"><div class="pro-it-hd"><span class="pro-it-t">${esc(e.title)}</span><span class="pro-it-d">${esc(e.period)}</span></div>${e.org?`<div class="pro-it-s">${[e.org,e.city].filter(Boolean).map(esc).join(' — ')}</div>`:''} ${e.desc?`<div class="pro-it-desc">${esc(e.desc)}</div>`:''}</div>`).join('')}</div>`:''}
+        ${d.edus.length?`<div class="pro-sec"><div class="pro-sec-h" style="border-color:${ac};color:${ac}">${t('cv_edu')}</div>${d.edus.map(e=>`<div class="pro-it"><div class="pro-it-hd"><span class="pro-it-t">${esc(e.deg)}</span><span class="pro-it-d">${esc(e.year)}</span></div>${e.school?`<div class="pro-it-s">${[e.school,e.mention].filter(Boolean).map(esc).join(' · ')}</div>`:''}</div>`).join('')}</div>`:''}
+        ${d.interests?`<div class="pro-sec"><div class="pro-sec-h" style="border-color:${ac};color:${ac}">${t('cv_interests')}</div><div class="pro-sum">${esc(d.interests)}</div></div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildPrem(d){
+  const grads=[['#C49438','#7A4E0E'],['#30885C','#08401E'],['#B42C3A','#680A14'],['#A0A0C8','#404060'],['#C87818','#7A4206'],['#248ABC','#083C5C'],['#7E4CCC','#361070'],['#388CA2','#103C50']];
+  const sbBgs=['#0D1520','#0A1A12','#140608','#0C0C0E','#1A1208','#081420','#10101C','#101418'];
+  const hdBgs=['#162038','#0A2E1A','#26080C','#181820','#2E1E0C','#0C263C','#1C1630','#162028'];
+  const gi=Math.min(d.grad||0,grads.length-1);
+  const [ga,gb]=grads[gi];const sbBg=sbBgs[gi];const hdBg=hdBgs[gi];
+  const fullName=((d.first||'Prénom')+' '+(d.last||'Nom'));
+  const initials=((d.first||'?')[0]+(d.last||'?')[0]).toUpperCase();
+  const font=d.font||"'DM Sans',sans-serif";
+  const tmList=TMPLS.premium;const tm=tmList[d.tmpl]||tmList[0];
+  const useHex=tm.id==='P3'||tm.id==='P5';
+  const photoEl=d.photo
+    ?(useHex?`<img class="prem-av-hex" src="${d.photo}" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 8px">`
+             :`<img class="prem-av-rnd" src="${d.photo}">`)
+    :`<div class="prem-av-ph" style="font-family:${font}">${initials}</div>`;
+  return `<div class="cv-prem ${tm.id}" style="font-family:${font}">
+    <div class="prem-sb" style="background:${sbBg}">
+      ${photoEl}
+      <div style="text-align:center;font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;font-family:${font}">${esc(fullName)}</div>
+      ${d.job?`<div style="text-align:center;font-size:9.5px;color:rgba(255,255,255,.5);font-style:italic">${esc(d.job)}</div>`:''}
+      <div class="prem-sb-sec" style="margin-top:14px"><div class="prem-sb-sh">Contact</div>
+        ${d.email?`<div class="prem-sb-it"><span class="prem-sb-ic">✉</span>${esc(d.email)}</div>`:''}
+        ${d.phone?`<div class="prem-sb-it"><span class="prem-sb-ic">☏</span>${esc(d.phone)}</div>`:''}
+        ${d.loc?`<div class="prem-sb-it"><span class="prem-sb-ic">⌖</span>${esc(d.loc)}</div>`:''}
+        ${d.li?`<div class="prem-sb-it"><span class="prem-sb-ic">🔗</span>${esc(d.li)}</div>`:''}
+      </div>
+      ${d.skills.length?`<div class="prem-sb-sec"><div class="prem-sb-sh">${t('cv_skills')}</div>${d.skills.slice(0,8).map(s=>`<div class="prem-sk-it"><div class="prem-sk-n">${esc(s)}</div><div class="prem-sk-bg"><div class="prem-sk-f" style="width:${60+Math.random()*35|0}%;background:linear-gradient(90deg,${ga},${gb})"></div></div></div>`).join('')}</div>`:''}
+      ${d.langs.length?`<div class="prem-sb-sec"><div class="prem-sb-sh">${t('cv_langs')}</div>${d.langs.map(l=>`<div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.6);margin-bottom:3px"><span>${esc(l.lang)}</span><span style="opacity:.5">${esc(l.level)}</span></div>`).join('')}</div>`:''}
+    </div>
+    <div class="prem-main">
+      <div class="prem-hd" style="background:${hdBg}">
+        <div class="prem-hd-n" style="font-family:${font}">${esc(fullName)}</div>
+        ${d.job?`<div class="prem-hd-t">${esc(d.job)}</div>`:''}
+      </div>
+      <div class="prem-body">
+        ${d.sum?`<div class="prem-sec"><div class="prem-sec-h">${t('cv_profile')}</div><div class="prem-it-desc" style="font-size:11px;color:#444;line-height:1.65">${esc(d.sum)}</div></div>`:''}
+        ${d.exps.length?`<div class="prem-sec"><div class="prem-sec-h">${t('cv_exp')}</div>${d.exps.map(e=>`<div class="prem-it"><div class="prem-it-hd"><span class="prem-it-t">${esc(e.title)}</span><span class="prem-it-d">${esc(e.period)}</span></div>${e.org?`<div class="prem-it-s">${[e.org,e.city].filter(Boolean).map(esc).join(' — ')}</div>`:''} ${e.desc?`<div class="prem-it-desc">${esc(e.desc)}</div>`:''}</div>`).join('')}</div>`:''}
+        ${d.edus.length?`<div class="prem-sec"><div class="prem-sec-h">${t('cv_edu')}</div>${d.edus.map(e=>`<div class="prem-it"><div class="prem-it-hd"><span class="prem-it-t">${esc(e.deg)}</span><span class="prem-it-d">${esc(e.year)}</span></div>${e.school?`<div class="prem-it-s">${[e.school,e.mention].filter(Boolean).map(esc).join(' · ')}</div>`:''}</div>`).join('')}</div>`:''}
+        ${d.interests?`<div class="prem-sec"><div class="prem-sec-h">${t('cv_interests')}</div><div class="prem-tags">${d.interests.split(',').map(x=>`<span class="prem-tag">${esc(x.trim())}</span>`).join('')}</div></div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════
+// PAYMENT FLOW
+// ═══════════════════════════════════
+function openPayModal(){
+  const plan=PLANS[S.plan];
+  document.getElementById('pm-price').textContent=plan.amt.toLocaleString();
+  document.getElementById('pm-sub').textContent=plan.label+' — Paiement sécurisé';
+  const fl=document.getElementById('pm-feats');
+  fl.innerHTML=plan.feats.map(f=>`<li class="pm-fi"><span class="pm-fc">✓</span>${f}</li>`).join('');
+  document.getElementById('pm-init').style.display='';
+  document.getElementById('pm-wait').classList.remove('show');
+  document.getElementById('pay-modal').classList.add('open');
+  hideBlur();
+}
+
+function goPay(){
+  if(!validateForm()){toast('Remplis les champs obligatoires','#c0392b');document.getElementById('pay-modal').classList.remove('open');goForm();return;}
+  const sk='cvcraft_'+Date.now()+'_'+Array.from(crypto.getRandomValues(new Uint8Array(8))).map(b=>b.toString(16).padStart(2,'0')).join('');
+  sessionStorage.setItem('cv_sk',sk);
+  sessionStorage.setItem('cv_paid','0');
+  sessionStorage.setItem('cv_data',JSON.stringify(getFormData()));
+  const plan=PLANS[S.plan];
+  document.getElementById('pm-init').style.display='none';
+  document.getElementById('pm-wait').classList.add('show');
+  startPayCountdown();
+  // Build return URL
+  const d=getFormData();
+  const retUrl=encodeURIComponent(CFG.SITE_URL+'?cv_paid=1&sk='+sk+'&plan='+S.plan+'&name='+encodeURIComponent(d.first+' '+d.last)+'&email='+encodeURIComponent(d.email));
+  const cancelUrl=encodeURIComponent(CFG.SITE_URL+'?cv_cancel=1');
+  const payUrl=`${plan.url}?return_url=${retUrl}&cancel_url=${cancelUrl}&reference=${sk}&amount=${plan.amt}&currency=XOF`;
+  // Try SDK first
+  if(window.LeekPay&&!window.LeekPaySDKFailed){
+    try{
+      LeekPay.checkout({amount:plan.amt,currency:'XOF',apiKey:CFG.LP_PUB,reference:sk,
+        description:plan.label+' — CVCraft',
+        onSuccess:()=>confirmPayment(d),
+        onCancel:()=>{document.getElementById('pay-modal').classList.remove('open');toast('Paiement annulé','#c0392b');},
+        onError:()=>{window.location.href=payUrl;}
+      });return;
+    }catch(e){}
   }
+  // Fallback: open popup
+  let popup=null;
+  try{popup=window.open(payUrl,'_blank','width=500,height=700');}catch(e){}
+  if(!popup||popup.closed){window.location.href=payUrl;return;}
+  // Poll every 2s
+  clearInterval(payPollInt);
+  payPollInt=setInterval(()=>{
+    const params=new URLSearchParams(window.location.search);
+    if(params.get('cv_paid')==='1'||sessionStorage.getItem('cv_paid')==='1'){
+      clearInterval(payPollInt);confirmPayment(getFormData());
+    }
+    try{if(popup.closed){clearInterval(payPollInt);}}catch(e){}
+  },2000);
+}
 
-  // Form submit spinner
-  document.getElementById('cv-form').addEventListener('submit', function() {
-    const btn = document.getElementById('submit-btn');
-    btn.classList.add('loading');
-    btn.querySelector('.btn-text').textContent = 'Génération en cours';
+function startPayCountdown(){
+  payTimeLeft=300;clearInterval(payTimerInt);
+  const fill=document.getElementById('ptfill');
+  const cd=document.getElementById('pm-countdown');
+  payTimerInt=setInterval(()=>{
+    payTimeLeft--;
+    if(fill)fill.style.width=(payTimeLeft/300*100)+'%';
+    if(cd){const m=Math.floor(payTimeLeft/60),s=payTimeLeft%60;cd.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+    if(payTimeLeft<=0){
+      clearInterval(payTimerInt);
+      toast('Délai expiré. Réessayez.','#c0392b');
+    }
+  },1000);
+}
+
+function manualConfirm(){
+  clearInterval(payPollInt);clearInterval(payTimerInt);
+  confirmPayment(getFormData());
+}
+
+function confirmPayment(d){
+  clearInterval(payPollInt);clearInterval(payTimerInt);stopTimer();
+  // Save to DB
+  const txId='TX_'+Date.now();
+  const tx={id:txId,date:new Date().toISOString(),nom:`${d.first||''} ${d.last||''}`.trim(),email:d.email||'',plan:d.plan||S.plan,amt:PLANS[d.plan||S.plan]?.amt||0,status:'confirmed'};
+  const db=JSON.parse(localStorage.getItem('cvcraft_db_v3')||'{"txs":[],"cvs":[],"clients":[]}');
+  db.txs.push(tx);db.cvs.push(tx);
+  const ci=db.clients.findIndex(c=>c.email===tx.email);
+  if(ci>=0)db.clients[ci].count=(db.clients[ci].count||0)+1;
+  else db.clients.push({nom:tx.nom,email:tx.email,plan:tx.plan,date:tx.date,paid:true,count:1});
+  localStorage.setItem('cvcraft_db_v3',JSON.stringify(db));
+  sessionStorage.setItem('cv_paid','1');sessionStorage.setItem('cv_unlocked','1');
+  document.getElementById('pay-modal').classList.remove('open');
+  showPage('page-success');
+}
+
+// Listen for postMessage from LeekPay
+window.addEventListener('message',e=>{
+  const o=e.origin||'';
+  if(!o.includes('leekpay'))return;
+  if(e.data==='payment_success'||e.data?.status==='success'||e.data?.paid===true){
+    confirmPayment(getFormData());
+  }
+});
+
+// ═══════════════════════════════════
+// DOWNLOAD PDF
+// ═══════════════════════════════════
+function downloadCV(){
+  const raw=sessionStorage.getItem('cv_data');
+  const d=raw?JSON.parse(raw):getFormData();
+  const cvHtml=buildCVHTML(d);
+  const gfUrl='https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Oswald:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap';
+  const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="${gfUrl}" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4;margin:0}
+@media print{body{width:794px;margin:0}}
+${Array.from(document.styleSheets).flatMap(s=>{try{return Array.from(s.cssRules).map(r=>r.cssText);}catch(e){return[];}}).join('\n')}
+.cv-simple,.cv-pro,.cv-prem{box-shadow:none!important;width:794px!important;min-height:1123px}
+</style></head><body>${cvHtml}</body></html>`;
+  const blob=new Blob([doc],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  let w=null;
+  try{w=window.open(url,'_blank');}catch(e){}
+  if(!w||w.closed){
+    const a=document.createElement('a');
+    const fn=`CV_${(d.first||'cv').replace(/\s+/g,'_')}_${(d.last||'cvcraft').replace(/\s+/g,'_')}.html`;
+    a.href=url;a.download=fn;a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+    toast('Fichier téléchargé ! Ouvre dans Chrome → Imprimer → PDF','var(--amber)');
+  } else {
+    w.addEventListener('load',()=>{setTimeout(()=>{w.print();setTimeout(()=>URL.revokeObjectURL(url),1000);},600);});
+  }
+  sessionStorage.removeItem('cv_paid');sessionStorage.removeItem('cv_data');
+}
+
+// ═══════════════════════════════════
+// CHECK RETURN FROM LEEKPAY
+// ═══════════════════════════════════
+function checkReturn(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('cv_paid')==='1'){
+    const raw=sessionStorage.getItem('cv_data');
+    const d=raw?JSON.parse(raw):{plan:'pro'};
+    if(d.plan)S.plan=d.plan;
+    confirmPayment(d);
+    window.history.replaceState({},'',window.location.pathname);
+  }else if(p.get('cv_cancel')==='1'){
+    toast('Paiement annulé. Réessayez quand vous voulez.','#c0392b');
+    window.history.replaceState({},'',window.location.pathname);
+  }
+}
+
+// ═══════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════
+function admLogin(){
+  const now=Date.now();
+  if(admLockUntil>now){const mins=Math.ceil((admLockUntil-now)/60000);document.getElementById('adm-err').textContent=`Compte bloqué. Réessayez dans ${mins} min.`;document.getElementById('adm-err').style.display='block';return;}
+  const u=document.getElementById('adm-u').value.trim().toLowerCase();
+  const pw=document.getElementById('adm-p').value;
+  if((u==='admin'||u==='cvcraft')&&pw===admPw){
+    admAttempts=0;
+    document.getElementById('adm-login-screen').style.display='none';
+    document.getElementById('adm-dash').style.display='block';
+    loadAdmData();admTab('overview',document.querySelector('.adm-nav'));
+  } else {
+    admAttempts++;
+    if(admAttempts>=5){admLockUntil=now+15*60*1000;admAttempts=0;}
+    const rem=5-admAttempts;
+    document.getElementById('adm-err').textContent=`Identifiants incorrects. ${rem} tentative(s) restante(s).`;
+    document.getElementById('adm-err').style.display='block';
+  }
+}
+function admLogout(){document.getElementById('adm-login-screen').style.display='';document.getElementById('adm-dash').style.display='none';document.getElementById('adm-u').value='';document.getElementById('adm-p').value='';document.getElementById('adm-err').style.display='none';goHome();}
+function admTab(name,el){
+  document.querySelectorAll('.adm-nav').forEach(n=>n.classList.remove('on'));
+  document.querySelectorAll('.adm-tab').forEach(t=>{t.style.display='none';t.classList.remove('active');});
+  el?.classList.add('on');
+  const tab=document.getElementById('tab-'+name);
+  if(tab){tab.style.display='block';tab.classList.add('active');}
+  loadAdmData(name);
+}
+function loadAdmData(tab='overview'){
+  const db=JSON.parse(localStorage.getItem('cvcraft_db_v3')||'{"txs":[],"cvs":[],"clients":[]}');
+  const txs=db.txs||[];const cvs=db.cvs||[];const clients=db.clients||[];
+  const now=new Date();
+  document.getElementById('adm-date').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const totalRev=txs.reduce((s,t)=>s+t.amt,0);
+  const thisWeek=cvs.filter(c=>{const d=new Date(c.date);return (now-d)<7*86400000;}).length;
+  const today=txs.filter(t=>{const d=new Date(t.date);return d.toDateString()===now.toDateString();}).length;
+  const conv=cvs.length?Math.round(txs.length/cvs.length*100):0;
+  document.getElementById('kv-rev').textContent=totalRev.toLocaleString()+' FCFA';
+  document.getElementById('kv-cv').textContent=cvs.length;document.getElementById('ks-cv').textContent='↑ '+thisWeek;
+  document.getElementById('kv-pay').textContent=txs.length;document.getElementById('ks-pay').textContent='↑ '+today;
+  document.getElementById('kv-conv').textContent=conv+'%';
+  if(tab==='overview'||tab==='overview'){setTimeout(()=>drawCharts(txs,cvs),100);}
+  if(tab==='transactions'){
+    document.getElementById('tx-count').textContent=txs.length+' entrées';
+    document.getElementById('tx-tbody').innerHTML=txs.slice().reverse().map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('fr-FR')}</td><td>${esc(t.nom)}</td><td><span class="badge bOK">${t.plan}</span></td><td style="font-weight:600">${t.amt?.toLocaleString()} FCFA</td><td><span class="badge bOK">✓ Confirmé</span></td><td style="font-family:var(--FM);font-size:10px;color:var(--ash)">${t.id}</td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--ash);padding:20px">Aucune transaction</td></tr>';
+  }
+  if(tab==='downloads'){
+    document.getElementById('dl-count').textContent=txs.length;
+    document.getElementById('dl-tbody').innerHTML=txs.slice().reverse().map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('fr-FR')}</td><td>${esc(t.nom)}</td><td>${esc(t.email)}</td><td>${t.plan}</td><td>${t.amt?.toLocaleString()} FCFA</td><td><span class="badge bOK">✓ Approuvé</span></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--ash);padding:20px">Aucun téléchargement</td></tr>';
+  }
+  if(tab==='clients'){
+    document.getElementById('cl-count').textContent=clients.length+' clients';
+    document.getElementById('cl-tbody').innerHTML=clients.slice().reverse().map(c=>`<tr><td>${esc(c.nom)}</td><td>${esc(c.email)}</td><td>${c.plan||'—'}</td><td>${new Date(c.date).toLocaleDateString('fr-FR')}</td><td>${PLANS[c.plan]?.amt?.toLocaleString()||'—'} FCFA</td><td><span class="badge bOK">✓ Actif</span></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--ash);padding:20px">Aucun client</td></tr>';
+  }
+  if(tab==='analytics'){
+    const byPlan={simple:0,pro:0,premium:0};txs.forEach(t=>{byPlan[t.plan]=(byPlan[t.plan]||0)+t.amt;});
+    const top=Object.entries(byPlan).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+    document.getElementById('an-avg').textContent=txs.length?Math.round(totalRev/txs.length).toLocaleString()+' FCFA':'0 FCFA';
+    document.getElementById('an-top').textContent=top.charAt(0).toUpperCase()+top.slice(1);
+    document.getElementById('an-dl').textContent=txs.length;
+    document.getElementById('an-drop').textContent=cvs.length?(100-conv)+'%':'0%';
+    setTimeout(()=>drawAnalytics(txs),100);
+  }
+}
+function drawCharts(txs,cvs){
+  if(typeof Chart==='undefined')return;
+  // Revenue 30d
+  const rev30={};for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);rev30[d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})]=0;}
+  txs.forEach(t=>{const k=new Date(t.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});if(rev30[k]!==undefined)rev30[k]+=t.amt;});
+  const ctx1=document.getElementById('ch-rev');if(ctx1){Chart.getChart(ctx1)?.destroy();new Chart(ctx1,{type:'bar',data:{labels:Object.keys(rev30).filter((_,i)=>i%3===0),datasets:[{data:Object.values(rev30).filter((_,i)=>i%3===0),backgroundColor:'rgba(160,104,32,.6)',borderColor:'rgba(160,104,32,1)',borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}});}
+  // Plans pie
+  const byPlan={Simple:0,Pro:0,Premium:0};txs.forEach(t=>{const k=t.plan==='simple'?'Simple':t.plan==='pro'?'Pro':'Premium';byPlan[k]+=t.amt;});
+  const ctx2=document.getElementById('ch-plans');if(ctx2){Chart.getChart(ctx2)?.destroy();new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(byPlan),datasets:[{data:Object.values(byPlan),backgroundColor:['rgba(24,56,104,.7)','rgba(30,92,58,.7)','rgba(160,104,32,.7)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});}
+  // CVs per week
+  const w12=Array(12).fill(0);cvs.forEach(c=>{const wk=Math.floor((Date.now()-new Date(c.date).getTime())/604800000);if(wk<12)w12[11-wk]++;});
+  const ctx3=document.getElementById('ch-cvs');if(ctx3){Chart.getChart(ctx3)?.destroy();new Chart(ctx3,{type:'line',data:{labels:Array.from({length:12},(_,i)=>`S-${11-i}`),datasets:[{data:w12,borderColor:'rgba(30,92,58,1)',backgroundColor:'rgba(30,92,58,.08)',fill:true,tension:.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}});}
+  // Conversion
+  const ctx4=document.getElementById('ch-conv');if(ctx4){Chart.getChart(ctx4)?.destroy();const months=Array.from({length:6},(_,i)=>{const d=new Date();d.setMonth(d.getMonth()-5+i);return d.toLocaleDateString('fr-FR',{month:'short'});});new Chart(ctx4,{type:'line',data:{labels:months,datasets:[{data:months.map(()=>Math.random()*60+20|0),borderColor:'rgba(160,104,32,1)',backgroundColor:'rgba(160,104,32,.08)',fill:true,tension:.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{callback:v=>v+'%',font:{size:9}}}}}});}
+}
+function drawAnalytics(txs){
+  if(typeof Chart==='undefined')return;
+  const byPlan={simple:0,pro:0,premium:0};txs.forEach(t=>{byPlan[t.plan]=(byPlan[t.plan]||0)+t.amt;});
+  const ctx5=document.getElementById('ch-rp');if(ctx5){Chart.getChart(ctx5)?.destroy();new Chart(ctx5,{type:'bar',data:{labels:['Simple','Pro','Premium'],datasets:[{data:[byPlan.simple,byPlan.pro,byPlan.premium],backgroundColor:['rgba(24,56,104,.7)','rgba(30,92,58,.7)','rgba(160,104,32,.7)'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:9}}}}}});}
+  const hrs=Array(24).fill(0);txs.forEach(t=>{const h=new Date(t.date).getHours();hrs[h]++;});
+  const ctx6=document.getElementById('ch-hr');if(ctx6){Chart.getChart(ctx6)?.destroy();new Chart(ctx6,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{data:hrs,backgroundColor:'rgba(30,92,58,.6)',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:8}}},y:{ticks:{font:{size:9}}}}}});}
+}
+function changeAdminPw(){const v=document.getElementById('new-pw')?.value.trim();const m=document.getElementById('pw-msg');if(!v||v.length<4){m.style.color='var(--ruby)';m.textContent='Mot de passe trop court (min. 4 caractères).';return;}admPw=v;m.style.color='var(--forest)';m.textContent='✓ Mot de passe mis à jour (session uniquement).';}
+function exportCSV(){
+  const db=JSON.parse(localStorage.getItem('cvcraft_db_v3')||'{"txs":[]}');
+  const txs=db.txs||[];
+  const rows=[['Date','Nom','Email','Formule','Montant (FCFA)','Statut','Référence'],...txs.map(t=>[new Date(t.date).toLocaleDateString('fr-FR'),t.nom,t.email,t.plan,t.amt,'Confirmé',t.id])];
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`cvcraft_transactions_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  toast('CSV exporté avec succès','var(--forest)');
+}
+
+// ═══════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════
+function toggleFaq(el){el.parentElement.classList.toggle('open');}
+function toast(msg,color='var(--void)'){
+  const t=document.getElementById('toast');const m=document.getElementById('t-msg');const ic=document.getElementById('t-ic');
+  if(!t||!m)return;
+  t.style.background=color;m.textContent=msg;ic.textContent='';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+}
+function scrollToForm(){selectPlan('pro');}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+function init(){
+  // Lang
+  if(S.lang==='en')document.getElementById('lang-btn').textContent='FR';
+  applyTr();
+  // Default plan UI
+  buildTmplGrid();buildFontPills();buildGradRow();
+  // Default lang row
+  addLang({lang:'Français',level:'Langue maternelle'});
+  // Check payment return from LeekPay redirect
+  checkReturn();
+  // Listen inputs for live update
+  ['f-first','f-last','f-job','f-email','f-phone','f-loc','f-li','f-sum','f-int'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('input',scheduleLiveUpdate);
   });
+}
+
+document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
