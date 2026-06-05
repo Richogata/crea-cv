@@ -342,13 +342,23 @@
         <div class="sublabel">Visualiser votre CV (1 min)</div>
       </div>
     </a>
-    <a href="/download/{{ client.id }}" class="action-btn">
+    {% if client.paid %}
+    <a href="/download/{{ client.id }}" class="action-btn" style="border-color:#a5d6a7;background:#f1f8f1;">
       <span class="icon">📥</span>
       <div>
         <div class="label">Télécharger</div>
-        <div class="sublabel">Après validation paiement</div>
+        <div class="sublabel" style="color:#2e7d32;">✓ Paiement validé</div>
       </div>
     </a>
+    {% else %}
+    <span class="action-btn" style="opacity:0.45;cursor:not-allowed;pointer-events:none;">
+      <span class="icon">🔒</span>
+      <div>
+        <div class="label">Télécharger</div>
+        <div class="sublabel">Paiement requis</div>
+      </div>
+    </span>
+    {% endif %}
   </div>
 
   <!-- LIEN APERÇU -->
