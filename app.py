@@ -8,6 +8,11 @@ from flask import (
     url_for, send_file, jsonify, abort, flash, make_response
 )
 from datetime import datetime
+try:
+    import requests as http_requests
+    HTTP_OK = True
+except ImportError:
+    HTTP_OK = False
 
 # ── WeasyPrint optionnel (non dispo sur Vercel) ──────────────────────────────
 try:
@@ -42,7 +47,9 @@ app = Flask(
 )
 app.secret_key = os.environ.get("SECRET_KEY", "cv_saas_secret_2024")
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "JESUS")
+ADMIN_PASSWORD  = os.environ.get("ADMIN_PASSWORD", "JESUS")
+LEEKPAY_SK      = os.environ.get("LEEKPAY_SK", "")   # Clé secrète LeekPay (sk_live_...)
+LEEKPAY_PK      = os.environ.get("LEEKPAY_PK", "pk_live_yXrH97aZ0APcEsQCMAtBJEWPPf1JLYlV")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
@@ -298,6 +305,61 @@ def download(client_id):
     # Payé uniquement → page téléchargement
     data = prepare_cv_data(client)
     return render_template("cv_download.html", cv=data)
+
+
+
+# ── Vérification paiement LeekPay (serveur) ──────────────────────────────────
+@app.route("/verify-payment", methods=["POST"])
+def verify_payment():
+    """
+    Vérifie côté serveur si une transaction LeekPay est bien payée.
+    Le client envoie sa référence, on interroge l'API LeekPay avec la clé secrète.
+    """
+    data = request.get_json(silent=True) or {}
+    reference = data.get("reference", "").strip()
+
+    if not reference:
+        return jsonify({"paid": False, "error": "Référence manquante"}), 400
+
+    # Si pas de clé secrète configurée → refuser systématiquement
+    if not LEEKPAY_SK:
+        return jsonify({"paid": False, "error": "Clé secrète LeekPay non configurée"}), 500
+
+    if not HTTP_OK:
+        return jsonify({"paid": False, "error": "Module requests manquant"}), 500
+
+    try:
+        # Appel API LeekPay : récupérer la transaction par référence
+        resp = http_requests.get(
+            f"https://api.leekpay.fr/v1/transactions",
+            headers={
+                "Authorization": f"Bearer {LEEKPAY_SK}",
+                "Content-Type": "application/json"
+            },
+            params={"reference": reference},
+            timeout=10
+        )
+        if resp.status_code != 200:
+            return jsonify({"paid": False, "error": f"API LeekPay: {resp.status_code}"}), 502
+
+        result = resp.json()
+
+        # LeekPay retourne une liste ou un objet selon l'endpoint
+        transactions = result.get("data") or result.get("transactions") or []
+        if isinstance(transactions, dict):
+            transactions = [transactions]
+
+        # Chercher la transaction avec notre référence et statut "paid"
+        for tx in transactions:
+            ref = tx.get("reference") or tx.get("ref") or ""
+            status = tx.get("status") or tx.get("state") or ""
+            if ref == reference and status.lower() in ("paid", "success", "completed", "approved"):
+                return jsonify({"paid": True, "transaction": tx})
+
+        return jsonify({"paid": False, "status": "not_found_or_pending"})
+
+    except Exception as e:
+        return jsonify({"paid": False, "error": str(e)}), 500
 
 
 # ── Routes Admin ─────────────────────────────────────────────────────────────
