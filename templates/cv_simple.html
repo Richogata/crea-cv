@@ -234,6 +234,17 @@
     .page { margin: 0; box-shadow: none; }
     .preview-bar { display: none !important; }
   }
+  {% if preview_mode %}
+  @media print {
+    body * { visibility: hidden !important; }
+    body::after {
+      visibility: visible !important;
+      content: "Paiement requis pour télécharger ce CV. Rendez-vous sur CréaCV.";
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-size: 24px; text-align: center; color: #333;
+    }
+  }
+  {% endif %}
 </style>
 </head>
 <body>
@@ -250,6 +261,20 @@
     el.textContent = "0" + Math.floor(t/60) + ":" + String(t%60).padStart(2,'0');
     t--;
   }, 1000);
+  // Bloquer toute tentative d'impression en mode aperçu
+  window.print = function() {
+    alert("⛔ Téléchargement non disponible.
+Effectuez le paiement pour obtenir votre CV PDF.");
+    return false;
+  };
+  window.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+      e.preventDefault();
+      alert("⛔ Téléchargement non disponible.
+Effectuez le paiement pour obtenir votre CV PDF.");
+    }
+  });
+  window.addEventListener('beforeprint', function(e) { e.stopImmediatePropagation(); window.stop && window.stop(); });
 </script>
 {% endif %}
 
