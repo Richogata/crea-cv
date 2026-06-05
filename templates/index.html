@@ -1834,47 +1834,65 @@ function openPayModal(){
   hideBlur();
 }
 
-function goPay(){
+async function goPay(){
   if(!validateForm()){toast('Remplis les champs obligatoires','#c0392b');document.getElementById('pay-modal').classList.remove('open');goForm();return;}
   const sk='cvcraft_'+Date.now()+'_'+Array.from(crypto.getRandomValues(new Uint8Array(8))).map(b=>b.toString(16).padStart(2,'0')).join('');
   sessionStorage.setItem('cv_sk',sk);
   sessionStorage.setItem('cv_paid','0');
-  sessionStorage.setItem('cv_data',JSON.stringify(getFormData()));
+  const d=getFormData();
+  sessionStorage.setItem('cv_data',JSON.stringify(d));
   const plan=PLANS[S.plan];
   document.getElementById('pm-init').style.display='none';
   document.getElementById('pm-wait').classList.add('show');
+  document.getElementById('pay-wait-t').textContent='Préparation du paiement...';
+  document.getElementById('pay-wait-s').textContent='Connexion sécurisée en cours.';
   startPayCountdown();
-  // Build return URL
-  const d=getFormData();
-  const retUrl=encodeURIComponent(CFG.SITE_URL+'?cv_paid=1&sk='+sk+'&plan='+S.plan+'&name='+encodeURIComponent(d.first+' '+d.last)+'&email='+encodeURIComponent(d.email));
-  const cancelUrl=encodeURIComponent(CFG.SITE_URL+'?cv_cancel=1');
-  const payUrl=`${plan.url}?return_url=${retUrl}&cancel_url=${cancelUrl}&reference=${sk}&amount=${plan.amt}&currency=XOF`;
-  // Try SDK first
-  if(window.LeekPay&&!window.LeekPaySDKFailed){
+  // ── ÉTAPE 1 : créer le checkout côté SERVEUR ─────────────────────────────
+  let checkoutId = null;
+  let payUrl = null;
+  try {
+    const resp = await fetch('/create-checkout', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({amount: plan.amt, plan: S.plan, reference: sk})
+    });
+    const result = await resp.json();
+    if(result.checkout_id && result.payment_url) {
+      checkoutId = result.checkout_id;
+      payUrl     = result.payment_url;
+      sessionStorage.setItem('cv_checkout_id', checkoutId);
+    }
+  } catch(e) { console.warn('create-checkout failed:', e); }
+  // ── ÉTAPE 2 : lancer le paiement ─────────────────────────────────────────
+  document.getElementById('pay-wait-t').textContent='En attente de confirmation LeekPay...';
+  document.getElementById('pay-wait-s').textContent='Complétez le paiement dans la fenêtre ouverte.';
+  // SDK LeekPay (si disponible)
+  if(window.LeekPay && !window.LeekPaySDKFailed && !payUrl){
     try{
-      LeekPay.checkout({amount:plan.amt,currency:'XOF',apiKey:CFG.LP_PUB,reference:sk,
-        description:plan.label+' — CVCraft',
-        onSuccess:()=>verifyPaymentServer(sk, d),
-        onCancel:()=>{document.getElementById('pay-modal').classList.remove('open');toast('Paiement annulé','#c0392b');},
-        onError:()=>{window.location.href=payUrl;}
+      LeekPay.checkout({amount:plan.amt, currency:'XOF', apiKey:CFG.LP_PUB, reference:sk,
+        description: plan.label+' — CVCraft',
+        onSuccess: ()=>verifyPaymentServer(checkoutId||sk, d),
+        onCancel:  ()=>{document.getElementById('pay-modal').classList.remove('open');toast('Paiement annulé','#c0392b');},
+        onError:   ()=>{ if(payUrl) window.location.href=payUrl; }
       });return;
     }catch(e){}
   }
-  // Fallback: open popup
+  // Fallback : popup ou redirection
+  if(!payUrl){
+    // Si le serveur a échoué, fallback sur les liens directs (moins sécurisé)
+    const retUrl=encodeURIComponent(window.location.origin+'?cv_paid=1&sk='+sk);
+    const cancelUrl=encodeURIComponent(window.location.origin+'?cv_cancel=1');
+    payUrl=`${plan.url}?return_url=${retUrl}&cancel_url=${cancelUrl}&reference=${sk}&amount=${plan.amt}&currency=XOF`;
+  }
   let popup=null;
   try{popup=window.open(payUrl,'_blank','width=500,height=700');}catch(e){}
   if(!popup||popup.closed){window.location.href=payUrl;return;}
-  // Poll every 2s
+  // Poll toutes les 2s — vérification SERVEUR uniquement
   clearInterval(payPollInt);
   payPollInt=setInterval(()=>{
-    const params=new URLSearchParams(window.location.search);
-    if(params.get('cv_paid')==='1'||sessionStorage.getItem('cv_paid')==='1'){
-      clearInterval(payPollInt);confirmPayment(getFormData());
-    }
     try{if(popup.closed){
       clearInterval(payPollInt);
-      // popup fermée — vérifier via serveur si le paiement est passé
-      verifyPaymentServer(sessionStorage.getItem('cv_sk'), getFormData());
+      verifyPaymentServer(checkoutId||sk, d);
     }}catch(e){}
   },2000);
 }
@@ -1994,12 +2012,14 @@ function checkReturn(){
   const p=new URLSearchParams(window.location.search);
   if(p.get('cv_paid')==='1'){
     const sk=p.get('sk')||sessionStorage.getItem('cv_sk');
+    const checkoutId=sessionStorage.getItem('cv_checkout_id');
     const raw=sessionStorage.getItem('cv_data');
     const d=raw?JSON.parse(raw):{plan:'pro'};
     if(d.plan)S.plan=d.plan;
     window.history.replaceState({},'',window.location.pathname);
-    // Vérification obligatoire côté serveur avant de débloquer
-    if(sk){ verifyPaymentServer(sk, d); }
+    // Vérification obligatoire côté serveur — priorité au checkout_id LeekPay
+    const ref = checkoutId || sk;
+    if(ref){ verifyPaymentServer(ref, d); }
     else { toast('Référence de paiement introuvable. Contactez le support.','#c0392b'); }
   }else if(p.get('cv_cancel')==='1'){
     toast('Paiement annulé. Réessayez quand vous voulez.','#c0392b');
