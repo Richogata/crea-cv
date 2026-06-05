@@ -282,7 +282,8 @@ def preview(client_id):
         abort(404)
     data         = prepare_cv_data(client)
     tpl_name     = f"cv_{data['template']}.html"
-    preview_mode = not bool(client.get("paid"))
+    # preview_mode=True = watermark + blocage impression si non payé
+    preview_mode = not bool(int(client.get("paid", 0)))
     return render_template(tpl_name, cv=data, preview_mode=preview_mode)
 
 
@@ -291,10 +292,10 @@ def download(client_id):
     client = get_client(client_id)
     if not client:
         abort(404)
-    # Pas encore payé → page de paiement
-    if not client["paid"]:
-        return render_template("payment_required.html", client=client)
-    # Payé → page impression navigateur (sans WeasyPrint, fonctionne partout)
+    # STRICT : bloquer tout accès si non payé — rediriger vers paiement
+    if not int(client.get("paid", 0)):
+        return redirect(url_for("success", client_id=client_id))
+    # Payé uniquement → page téléchargement
     data = prepare_cv_data(client)
     return render_template("cv_download.html", cv=data)
 
