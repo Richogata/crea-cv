@@ -308,6 +308,53 @@ def download(client_id):
 
 
 
+# ── Création checkout LeekPay (serveur) ──────────────────────────────────────
+@app.route("/create-checkout", methods=["POST"])
+def create_checkout():
+    """
+    Crée un checkout LeekPay côté serveur et retourne le checkout_id.
+    Le client n'a plus besoin de connaître la clé secrète.
+    """
+    data = request.get_json(silent=True) or {}
+    amount   = data.get("amount", 0)
+    plan     = data.get("plan", "pro")
+    ref      = data.get("reference", "")  # notre ref interne
+
+    if not LEEKPAY_SK or not HTTP_OK:
+        return jsonify({"error": "Service indisponible"}), 500
+
+    SITE = os.environ.get("SITE_URL", "https://crea-cv-kappa.vercel.app")
+
+    try:
+        resp = http_requests.post(
+            "https://leekpay.fr/api/v1/checkout",
+            headers={
+                "Authorization": f"Bearer {LEEKPAY_SK}",
+                "Content-Type":  "application/json"
+            },
+            json={
+                "amount":      int(amount),
+                "currency":    "XOF",
+                "description": f"CVCraft — CV {plan.capitalize()}",
+                "return_url":  f"{SITE}?cv_paid=1&sk={ref}",
+                "cancel_url":  f"{SITE}?cv_cancel=1",
+                "metadata":    {"internal_ref": ref, "plan": plan}
+            },
+            timeout=10
+        )
+        result = resp.json()
+        if resp.status_code in (200, 201) and result.get("success"):
+            checkout = result["data"]
+            return jsonify({
+                "checkout_id":  checkout["id"],
+                "payment_url":  checkout["payment_url"]
+            })
+        else:
+            return jsonify({"error": result.get("message", "Erreur LeekPay")}), 502
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ── Vérification paiement LeekPay (serveur) ──────────────────────────────────
 @app.route("/verify-payment", methods=["POST"])
 def verify_payment():
