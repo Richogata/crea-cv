@@ -1854,7 +1854,7 @@ function goPay(){
     try{
       LeekPay.checkout({amount:plan.amt,currency:'XOF',apiKey:CFG.LP_PUB,reference:sk,
         description:plan.label+' — CVCraft',
-        onSuccess:()=>confirmPayment(d),
+        onSuccess:()=>verifyPaymentServer(sk, d),
         onCancel:()=>{document.getElementById('pay-modal').classList.remove('open');toast('Paiement annulé','#c0392b');},
         onError:()=>{window.location.href=payUrl;}
       });return;
@@ -1871,7 +1871,11 @@ function goPay(){
     if(params.get('cv_paid')==='1'||sessionStorage.getItem('cv_paid')==='1'){
       clearInterval(payPollInt);confirmPayment(getFormData());
     }
-    try{if(popup.closed){clearInterval(payPollInt);}}catch(e){}
+    try{if(popup.closed){
+      clearInterval(payPollInt);
+      // popup fermée — vérifier via serveur si le paiement est passé
+      verifyPaymentServer(sessionStorage.getItem('cv_sk'), getFormData());
+    }}catch(e){}
   },2000);
 }
 
@@ -1891,8 +1895,8 @@ function startPayCountdown(){
 }
 
 function manualConfirm(){
-  clearInterval(payPollInt);clearInterval(payTimerInt);
-  confirmPayment(getFormData());
+  // Désactivé — vérification serveur requise
+  toast('Veuillez compléter le paiement dans la fenêtre ouverte.','#c0392b');
 }
 
 function confirmPayment(d){
@@ -1916,9 +1920,39 @@ window.addEventListener('message',e=>{
   const o=e.origin||'';
   if(!o.includes('leekpay'))return;
   if(e.data==='payment_success'||e.data?.status==='success'||e.data?.paid===true){
-    confirmPayment(getFormData());
+    verifyPaymentServer(sessionStorage.getItem('cv_sk'), getFormData());
   }
 });
+
+
+// ═══════════════════════════════════
+// VERIFY PAYMENT SERVER-SIDE
+// ═══════════════════════════════════
+async function verifyPaymentServer(reference, formData) {
+  if(!reference){ toast('Référence paiement manquante.','#c0392b'); return; }
+  document.getElementById('pay-modal').classList.add('open');
+  document.getElementById('pm-init').style.display='none';
+  document.getElementById('pm-wait').classList.add('show');
+  document.getElementById('pay-wait-t').textContent = 'Vérification du paiement...';
+  document.getElementById('pay-wait-s').textContent = 'Veuillez patienter, nous confirmons votre paiement.';
+  try {
+    const resp = await fetch('/verify-payment', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({reference: reference})
+    });
+    const result = await resp.json();
+    if(result.paid === true) {
+      confirmPayment(formData);
+    } else {
+      document.getElementById('pay-modal').classList.remove('open');
+      toast('Paiement non confirmé. Complétez le paiement et réessayez.','#c0392b');
+    }
+  } catch(e) {
+    document.getElementById('pay-modal').classList.remove('open');
+    toast('Erreur de vérification. Contactez le support.','#c0392b');
+  }
+}
 
 // ═══════════════════════════════════
 // DOWNLOAD PDF
@@ -1959,11 +1993,14 @@ ${Array.from(document.styleSheets).flatMap(s=>{try{return Array.from(s.cssRules)
 function checkReturn(){
   const p=new URLSearchParams(window.location.search);
   if(p.get('cv_paid')==='1'){
+    const sk=p.get('sk')||sessionStorage.getItem('cv_sk');
     const raw=sessionStorage.getItem('cv_data');
     const d=raw?JSON.parse(raw):{plan:'pro'};
     if(d.plan)S.plan=d.plan;
-    confirmPayment(d);
     window.history.replaceState({},'',window.location.pathname);
+    // Vérification obligatoire côté serveur avant de débloquer
+    if(sk){ verifyPaymentServer(sk, d); }
+    else { toast('Référence de paiement introuvable. Contactez le support.','#c0392b'); }
   }else if(p.get('cv_cancel')==='1'){
     toast('Paiement annulé. Réessayez quand vous voulez.','#c0392b');
     window.history.replaceState({},'',window.location.pathname);
